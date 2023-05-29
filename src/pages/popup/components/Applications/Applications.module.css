@@ -1,0 +1,85 @@
+.container {
+  width: 100%;
+  background-color: white;
+  border-radius: 2px;
+  padding: 0.25rem 0;
+  margin-bottom: 1.5rem;
+}
+
+.container th {
+  color: #6c757d;
+  font-size: 1rem;
+  font-weight: 500;
+  padding: 0.25rem 0;
+}
+
+.tableRow > td {
+  padding: 1.25rem;
+  border: 2px solid #fff;
+  border-top: 1px solid #b5e2f5;
+  border-collapse: separate;
+}
+
+.tableRow > td > div {
+  height: 90px;
+  display: flex;
+  flex-direction: column;
+}
+
+.companyCell {
+  width: 40%;
+}
+
+.companyData {
+  justify-content: space-between;
+}
+
+.companyName p {
+  font-size: 1.125rem;
+  width: 200px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.companyLink {
+  font-size: 1rem;
+  width: 200px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-decoration: none;
+}
+
+.statusCell {
+  width: 32%;
+}
+
+.statusData {
+  justify-content: space-between;
+  align-items: center;
+}
+
+.statusControls {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.statusData button {
+  width: 100%;
+}
+
+.statusControls img {
+  width: 38px;
+  height: 38px;
+  cursor: pointer;
+}
+
+.statusControls p {
+  font-size: 1.75rem;
+}
+
+.dateCell {
+  text-align: center;
+}

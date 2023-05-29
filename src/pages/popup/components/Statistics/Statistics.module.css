@@ -1,0 +1,49 @@
+.container {
+  width: 100%;
+  background-color: white;
+  border-radius: 2px;
+  display: flex;
+  justify-content: space-between;
+  padding: 0.25rem 0.75rem;
+}
+
+.itemContainer {
+  display: flex;
+  justify-content: center;
+  flex-grow: 1;
+}
+
+.item {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.itemContainer + .itemContainer {
+  border-left: 1px solid #b5e2f5;
+}
+
+.item img {
+  width: 30px;
+  height: 30px;
+}
+
+.item p {
+  font-size: 1rem;
+}
+
+.interviewStats {
+  display: flex;
+  gap: 1rem;
+}
+
+.round {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.roundNumber {
+  color: #2196f3;
+  font-size: 1rem;
+  font-weight: 500;
+}
