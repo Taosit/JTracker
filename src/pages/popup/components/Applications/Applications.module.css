@@ -1,4 +1,49 @@
-.container {
+.controlsContainer {
+  width: 100%;
+  display: flex;
+  gap: 1rem;
+}
+
+.searchContainer,
+.sortContainer {
+  background-color: white;
+  border-radius: 2px;
+  display: flex;
+  gap: 0.5rem;
+  padding: 0.25rem 0.5rem;
+}
+
+.searchContainer {
+  flex: 1;
+}
+
+.icon {
+  width: 30px;
+  height: 30px;
+}
+
+.iconContainer {
+  position: relative;
+  height: 30px;
+  padding-right: 0.5rem;
+  border-right: 1px solid #b5e2f5;
+}
+
+.searchInput {
+  border: none;
+  font-size: 1rem;
+  width: 100%;
+  padding: 0 0.5rem;
+}
+
+.sortSelect {
+  padding: 0 0.5rem;
+  border: none;
+  font-size: 1rem;
+  cursor: pointer;
+}
+
+.table {
   width: 100%;
   background-color: white;
   border-radius: 2px;
@@ -6,7 +51,7 @@
   margin-bottom: 1.5rem;
 }
 
-.container th {
+.table th {
   color: #6c757d;
   font-size: 1rem;
   font-weight: 500;

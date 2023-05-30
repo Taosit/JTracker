@@ -3,20 +3,39 @@ import DocumentIcon from "./images/document.svg";
 import CryIcon from "./images/cry.svg";
 import SpeakIcon from "./images/speak.svg";
 import HappyIcon from "./images/happy.svg";
+import React, { useCallback } from "react";
+import { useApplication } from "../../contexts/ApplicationContext";
 
-export const Statistics = () => {
+const StatisticsRaw = () => {
+  const { applications } = useApplication();
+  const numApplications = applications.length;
+
+  const getNumOfApplicationsByStage = useCallback(
+    (stage: Stage) => {
+      return applications.filter((application) => application.stage === stage)
+        .length;
+    },
+    [applications]
+  );
+
+  const numRejected = getNumOfApplicationsByStage("xx");
+  const numRound1 = getNumOfApplicationsByStage("r1");
+  const numRound2 = getNumOfApplicationsByStage("r2");
+  const numRound3 = getNumOfApplicationsByStage("r3");
+  const numOffers = getNumOfApplicationsByStage("of");
+
   return (
     <div className={styles.container}>
       <div className={styles.itemContainer}>
         <div className={styles.item}>
           <img src={DocumentIcon} alt="Applications sent" />
-          <p>0</p>
+          <p>{numApplications}</p>
         </div>
       </div>
       <div className={styles.itemContainer}>
         <div className={styles.item}>
           <img src={CryIcon} alt="Applications rejected" />
-          <p>0</p>
+          <p>{numRejected}</p>
         </div>
       </div>
       <div className={styles.itemContainer}>
@@ -25,15 +44,15 @@ export const Statistics = () => {
           <div className={styles.interviewStats}>
             <div className={styles.round}>
               <p className={styles.roundNumber}>R1</p>
-              <p>0</p>
+              <p>{numRound1}</p>
             </div>
             <div className={styles.round}>
               <p className={styles.roundNumber}>R2</p>
-              <p>0</p>
+              <p>{numRound2}</p>
             </div>
             <div className={styles.round}>
               <p className={styles.roundNumber}>R3</p>
-              <p>0</p>
+              <p>{numRound3}</p>
             </div>
           </div>
         </div>
@@ -41,9 +60,11 @@ export const Statistics = () => {
       <div className={styles.itemContainer}>
         <div className={styles.item}>
           <img src={HappyIcon} alt="Applications accepted" />
-          <p>0</p>
+          <p>{numOffers}</p>
         </div>
       </div>
     </div>
   );
 };
+
+export const Statistics = React.memo(StatisticsRaw);

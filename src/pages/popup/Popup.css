@@ -4,22 +4,30 @@
   padding: 0;
 }
 
+:root {
+  --primary-dark: #1c98cd;
+}
+
+h1,
+h2,
+h3,
 p,
 label,
 option,
 input,
-td {
+td,
+summary {
   color: #353b3e;
   font-size: 1rem;
 }
 
 a {
   text-decoration: none;
-  color: #1c98cd;
+  color: var(--primary-dark);
 }
 
 button {
-  background: #1c98cd;
+  background: var(--primary-dark);
   cursor: pointer;
   border: none;
   color: white;
@@ -35,7 +43,16 @@ button {
   overflow-y: auto;
 }
 
-.popup-container {
+.main {
+  position: relative;
+  width: 90%;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.details {
   position: relative;
   width: 90%;
   margin: 0 auto;
