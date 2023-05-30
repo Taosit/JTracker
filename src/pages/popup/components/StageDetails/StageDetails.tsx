@@ -7,6 +7,7 @@ import ChevronUpIcon from "./images/chevronUp.svg";
 import ChevronDownIcon from "./images/chevronDown.svg";
 import { useState } from "react";
 import { useApplication } from "../../contexts/ApplicationContext";
+import { IconButton } from "../IconButton/IconButton";
 
 type Props = {
   stage: ApplicationStage | Interview;
@@ -121,18 +122,18 @@ export const StageDetails = ({ stage }: Props) => {
                       value={editingQuestion.question}
                       onChange={editQuestionText}
                     />
-                    <img
-                      src={CheckmarkIcon}
-                      alt="save"
+                    <IconButton
+                      imageUrl={CheckmarkIcon}
+                      altText="Save"
                       onClick={saveQuestion}
                     />
                   </>
                 ) : (
                   <>
                     <h3>Q: {question.question}</h3>
-                    <img
-                      src={EditIcon}
-                      alt="edit"
+                    <IconButton
+                      imageUrl={EditIcon}
+                      altText="Edit"
                       onClick={() => startEdit(question)}
                     />
                   </>
@@ -147,9 +148,9 @@ export const StageDetails = ({ stage }: Props) => {
                 ) : (
                   <p>A: {question.answer}</p>
                 )}
-                <img
-                  src={CopyIcon}
-                  alt="copy"
+                <IconButton
+                  imageUrl={CopyIcon}
+                  altText="Copy"
                   onClick={() => copyText(question.answer)}
                 />
               </div>

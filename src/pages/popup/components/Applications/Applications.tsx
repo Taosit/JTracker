@@ -6,6 +6,7 @@ import NextIcon from "./images/arrowRight.svg";
 import { useState } from "react";
 import { toDateString } from "../../../../utils/helpers";
 import { useApplication } from "../../contexts/ApplicationContext";
+import { IconButton } from "../IconButton/IconButton";
 
 type UpdateApplication = (
   application: Application
@@ -123,22 +124,22 @@ export const Applications = () => {
             <td className={styles.statusCell}>
               <div className={styles.statusData}>
                 <div className={styles.statusControls}>
-                  <img
+                  <IconButton
+                    className={styles.iconButton}
+                    imageUrl={RejectIcon}
+                    altText="Application Rejected"
                     onClick={() =>
                       updateAndSaveApplications(application, rejectApplication)
                     }
-                    role="button"
-                    src={RejectIcon}
-                    alt="Reject"
                   />
                   <p>{application.stage.toUpperCase()}</p>
-                  <img
+                  <IconButton
+                    className={styles.iconButton}
+                    imageUrl={NextIcon}
+                    altText="Application Advanced"
                     onClick={() =>
                       updateAndSaveApplications(application, advanceApplication)
                     }
-                    role="button"
-                    src={NextIcon}
-                    alt="Next Step"
                   />
                 </div>
                 <button

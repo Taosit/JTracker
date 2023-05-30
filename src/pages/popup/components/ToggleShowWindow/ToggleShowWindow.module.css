@@ -25,7 +25,7 @@
   height: 0;
 }
 
-.checkbox:focus + .slider {
+.checkbox:focus-visible + .slider {
   outline: 2px solid var(--toggle-color);
   outline-offset: 2px;
 }

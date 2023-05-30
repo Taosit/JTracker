@@ -29,6 +29,11 @@
   border-right: 1px solid #b5e2f5;
 }
 
+.iconButton {
+  width: 38px;
+  height: 38px;
+}
+
 .searchInput {
   border: none;
   font-size: 1rem;
@@ -113,12 +118,6 @@
 
 .statusData button {
   width: 100%;
-}
-
-.statusControls img {
-  width: 38px;
-  height: 38px;
-  cursor: pointer;
 }
 
 .statusControls p {
