@@ -20,6 +20,8 @@ export const StageDetails = ({ stage }: Props) => {
   const [draftStage, setDraftStage] = useState(stage);
   const [isOpen, setIsOpen] = useState(true);
 
+  const [isEditingNote, setIsEditingNote] = useState(false);
+
   const isInterview = (
     stage: ApplicationStage | Interview
   ): stage is Interview => {
@@ -33,6 +35,22 @@ export const StageDetails = ({ stage }: Props) => {
       return date;
     }
     return `on ${date}`;
+  };
+
+  const saveInterviewDate = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const updatedStage = {
+      ...draftStage,
+      date: new Date(`${e.target.value}T00:00:00`),
+    };
+    const updatedApplications = updateStageDetails(
+      viewingApplicationId,
+      updatedStage
+    );
+    chrome.runtime.sendMessage({
+      event: "updateApplications",
+      data: updatedApplications,
+    });
+    setDraftStage(updatedStage);
   };
 
   const copyText = (answer: string) => {
@@ -95,6 +113,26 @@ export const StageDetails = ({ stage }: Props) => {
     setEditingQuestion(question);
   };
 
+  const onNoteChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    const updatedStage = {
+      ...draftStage,
+      notes: e.target.value,
+    };
+    setDraftStage(updatedStage);
+  };
+
+  const saveNote = () => {
+    const updatedApplications = updateStageDetails(
+      viewingApplicationId,
+      draftStage
+    );
+    chrome.runtime.sendMessage({
+      event: "updateApplications",
+      data: updatedApplications,
+    });
+    setIsEditingNote(false);
+  };
+
   return (
     <details open={isOpen}>
       <summary
@@ -104,62 +142,117 @@ export const StageDetails = ({ stage }: Props) => {
           setIsOpen((prev) => !prev);
         }}
       >
-        <p>
-          {isInterview(stage) ? `R${stage.round} Interview ` : "Applied "}
-          {getDate(stage)}
-        </p>
+        <div className={styles.headerInfo}>
+          <p>
+            {isInterview(stage) ? `R${stage.round} Interview ` : "Applied "}
+            {getDate(stage)}
+          </p>
+          {isInterview(stage) && (
+            <label
+              className={styles.datepicker}
+              onClick={(e) => e.stopPropagation()}
+              onKeyDown={(e) => {
+                e.preventDefault();
+              }}
+              tabIndex={1}
+            >
+              <span className={styles.datepickerButton}></span>
+              <input
+                tabIndex={-1}
+                type="date"
+                onChange={saveInterviewDate}
+                className={styles.datepickerInput}
+              />
+            </label>
+          )}
+        </div>
         <img src={isOpen ? ChevronUpIcon : ChevronDownIcon} alt="chevron" />
       </summary>
       <div className={styles.body}>
-        <ol className={styles.questions}>
-          {draftStage.questions.map((question, index) => (
-            <li className={styles.question} key={index}>
-              <div className={styles.questionText}>
-                {question.id === editingQuestion?.id ? (
-                  <>
-                    <input
-                      type="text"
-                      value={editingQuestion.question}
-                      onChange={editQuestionText}
+        {draftStage.questions.length === 0 ? (
+          <p className={styles.noItem}>No quesion</p>
+        ) : (
+          <ol className={styles.questions}>
+            {draftStage.questions.map((question, index) => (
+              <li className={styles.question} key={index}>
+                <div className={styles.questionText}>
+                  {question.id === editingQuestion?.id ? (
+                    <>
+                      <input
+                        type="text"
+                        placeholder="Question"
+                        value={editingQuestion.question}
+                        onChange={editQuestionText}
+                      />
+                      <IconButton
+                        imageUrl={CheckmarkIcon}
+                        altText="Save"
+                        onClick={saveQuestion}
+                      />
+                    </>
+                  ) : (
+                    <>
+                      <h3>Q: {question.question}</h3>
+                      <IconButton
+                        imageUrl={EditIcon}
+                        altText="Edit"
+                        onClick={() => startEdit(question)}
+                      />
+                    </>
+                  )}
+                </div>
+                <div className={styles.answer}>
+                  {question.id === editingQuestion?.id ? (
+                    <textarea
+                      placeholder="Your answer to the question"
+                      value={editingQuestion.answer}
+                      onChange={editAnswerText}
                     />
-                    <IconButton
-                      imageUrl={CheckmarkIcon}
-                      altText="Save"
-                      onClick={saveQuestion}
-                    />
-                  </>
-                ) : (
-                  <>
-                    <h3>Q: {question.question}</h3>
-                    <IconButton
-                      imageUrl={EditIcon}
-                      altText="Edit"
-                      onClick={() => startEdit(question)}
-                    />
-                  </>
-                )}
-              </div>
-              <div className={styles.answer}>
-                {question.id === editingQuestion?.id ? (
-                  <textarea
-                    value={editingQuestion.answer}
-                    onChange={editAnswerText}
+                  ) : (
+                    <p>A: {question.answer}</p>
+                  )}
+                  <IconButton
+                    imageUrl={CopyIcon}
+                    altText="Copy"
+                    onClick={() => copyText(question.answer)}
                   />
-                ) : (
-                  <p>A: {question.answer}</p>
-                )}
-                <IconButton
-                  imageUrl={CopyIcon}
-                  altText="Copy"
-                  onClick={() => copyText(question.answer)}
-                />
-              </div>
-            </li>
-          ))}
-        </ol>
+                </div>
+              </li>
+            ))}
+          </ol>
+        )}
         <div className={styles.buttons}>
           <button onClick={addQuestion}>Add Question</button>
-          <button>Add Note</button>
+        </div>
+        <div className={styles.note}>
+          {isEditingNote ? (
+            <textarea
+              placeholder="Add some notes"
+              value={draftStage.notes}
+              onChange={onNoteChange}
+            />
+          ) : (
+            <>
+              {draftStage.notes ? (
+                <p>Note: {draftStage.notes}</p>
+              ) : (
+                <p className={styles.noItem}>No Note</p>
+              )}
+            </>
+          )}
+          {isEditingNote ? (
+            <IconButton
+              imageUrl={CheckmarkIcon}
+              altText="Save"
+              onClick={saveNote}
+            />
+          ) : (
+            <IconButton
+              imageUrl={EditIcon}
+              altText="Edit"
+              onClick={() => setIsEditingNote(true)}
+            />
+          )}
         </div>
       </div>
     </details>

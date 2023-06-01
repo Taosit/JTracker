@@ -21,7 +21,8 @@ export const IconButton = ({
     }
   };
 
-  const handleClick = () => {
+  const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
+    event.stopPropagation();
     onClick();
   };
 
