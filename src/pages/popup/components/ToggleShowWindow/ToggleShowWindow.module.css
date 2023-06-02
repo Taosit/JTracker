@@ -6,7 +6,7 @@
   --toggle-text-width: 116px;
   --toggle-height: 20px;
   --toggle-width: calc(2 * var(--toggle-height));
-  --strick-width: 3px;
+  --stroke-width: 3px;
 }
 
 .switch {
@@ -47,10 +47,10 @@
 .slider:before {
   position: absolute;
   content: "";
-  height: calc(var(--toggle-height) - 2 * var(--strick-width));
-  width: calc(var(--toggle-height) - 2 * var(--strick-width));
-  left: var(--strick-width);
-  bottom: var(--strick-width);
+  height: calc(var(--toggle-height) - 2 * var(--stroke-width));
+  width: calc(var(--toggle-height) - 2 * var(--stroke-width));
+  left: var(--stroke-width);
+  bottom: var(--stroke-width);
   background-color: white;
   -webkit-transition: 0.4s;
   transition: 0.4s;

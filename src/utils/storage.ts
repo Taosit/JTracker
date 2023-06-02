@@ -1,6 +1,8 @@
 export interface LocalStorage {
   applications: ApplicationWithPrimativeDate[];
   viewingApplicationId: string | null;
+  urls: string[];
+  showWindow: boolean;
 }
 
 export const setStorage = (obj: Partial<LocalStorage>) => {

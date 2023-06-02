@@ -16,6 +16,27 @@ chrome.runtime.onInstalled.addListener(() => {
   setStorage({
     applications: [],
     viewingApplicationId: null,
+    urls: ["https://www.linkedin.com/"],
+    showWindow: false,
+  });
+
+  chrome.contextMenus.create({
+    id: "start-application",
+    title: "Start Application",
+    contexts: ["selection"],
+  });
+
+  chrome.contextMenus.onClicked.addListener((info, tab) => {
+    if (info.menuItemId === "start-application") {
+      console.log(info.selectionText, tab.url);
+      chrome.tabs.sendMessage(tab.id, {
+        event: "startApplication",
+        data: {
+          url: tab.url,
+          title: info.selectionText,
+        },
+      });
+    }
   });
 });
 
