@@ -2,29 +2,8 @@
   --primary-dark: #1c98cd;
   --primary-light: #b5e2f5;
   --gray-light: #e5ebee;
-  --margin-side: 1rem;
-  --drag-area-height: 1rem;
-}
-
-h1,
-h2,
-h3,
-p,
-label,
-option,
-input,
-td,
-summary {
-  color: #353b3e;
-  font-size: 1rem;
-  margin: 0;
-  font-weight: 400;
-}
-
-button {
-  background-color: transparent;
-  border: none;
-  cursor: pointer;
+  --margin-side: 16px;
+  --drag-area-height: 20px;
 }
 
 .content-view {
@@ -36,7 +15,29 @@ button {
   isolation: isolate;
   flex-direction: column;
   border: 2px solid var(--primary-dark);
+  border-top-width: var(--drag-area-height);
+  cursor: move;
   border-radius: 4px;
+  font-family: Arial, Helvetica, sans-serif;
+  box-sizing: border-box;
+}
+
+.content-view * {
+  box-sizing: border-box;
+}
+
+.content-view :where(h1, h2, p, label, option, input) {
+  color: #353b3e;
+  font-size: 16px;
+  margin: 0;
+  padding: 0;
+  font-weight: 400;
+}
+
+button {
+  background-color: transparent;
+  border: none;
+  cursor: pointer;
 }
 
 .drag-area {
@@ -52,6 +53,7 @@ button {
 .form-container {
   width: 100%;
   flex-grow: 1;
+  cursor: initial;
 }
 
 .form-header {
@@ -60,34 +62,57 @@ button {
 }
 
 .form-container form {
-  padding: 0.75rem var(--margin-side);
+  padding: 12px var(--margin-side);
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
+  gap: 8px;
 }
 
-.title {
-  padding: 0.5rem var(--margin-side) 0;
-  color: var(--primary-dark);
+.content-view .title {
+  font-size: 16px !important;
+  padding: 12px var(--margin-side) 0 !important;
+  color: var(--primary-dark) !important;
+  line-height: initial !important;
+  font-weight: 500 !important;
 }
 
 .input-container {
   display: flex;
   flex-direction: column;
-  gap: 0.25rem;
+  gap: 4px;
 }
 
 .input-row {
   width: 100%;
   display: flex;
-  gap: 0.5rem;
+  gap: 8px;
 }
 
 .input-row input {
-  flex-grow: 1;
-  background-color: var(--gray-light);
-  border-radius: 2px;
-  border: none;
+  flex-grow: 1 !important;
+  background-color: var(--gray-light) !important;
+  border-radius: 2px !important;
+  border: none !important;
+  padding-inline: 4px !important;
+  box-shadow: none !important;
+  height: 32px !important;
+}
+
+.input-row input:focus {
+  outline: 2px solid var(--primary-dark) !important;
+}
+
+.input-row button {
+  height: 32px;
+  padding: 0;
+}
+
+.input-row button:focus {
+  outline: none;
+}
+
+.input-row button:focus-visible {
+  outline: 2px solid var(--primary-dark);
 }
 
 /* controls */
@@ -95,28 +120,55 @@ button {
 .controls-container {
   width: 100%;
   background-color: var(--primary-light);
-  padding: 0.5rem var(--margin-side) 1rem;
+  padding: 8px var(--margin-side) 16px;
+  cursor: initial;
 }
 
 .page-controls {
   display: flex;
   justify-content: space-between;
-  gap: 1rem;
+  gap: 16px;
 }
 
 .page-button {
   display: flex;
-  gap: 0.5rem;
+  gap: 8px;
   align-items: center;
+  border-radius: 2px;
+}
+
+.page-button:focus {
+  outline: none;
+}
+
+.page-button:focus-visible {
+  outline: 2px solid var(--primary-dark);
+}
+
+.page-button p {
+  text-transform: capitalize;
+  font-weight: 400;
 }
 
 .done-button {
-  margin-top: 0.5rem;
+  margin-top: 8px;
+  padding-block: 2px;
   display: flex;
-  gap: 0.5rem;
+  gap: 8px;
   justify-content: center;
   align-items: center;
   background-color: var(--primary-dark);
   color: white;
+  font-size: 16px;
+  font-weight: 600;
   width: 100%;
+  border-radius: 2px;
+}
+
+.done-button:focus {
+  outline: none;
+}
+
+.done-button:focus-visible {
+  outline: 2px solid white;
 }

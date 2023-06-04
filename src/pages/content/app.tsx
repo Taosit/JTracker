@@ -45,8 +45,10 @@ export default function App() {
     const { clientX, clientY } = e;
     const { innerWidth, innerHeight } = window;
     const [newVertical, newHorizontal] = [
-      clientY < innerHeight / 2 ? ("top" as const) : ("bottom" as const),
-      clientX < innerWidth / 2 ? ("left" as const) : ("right" as const),
+      clientY < (innerHeight - 300) / 2
+        ? ("top" as const)
+        : ("bottom" as const),
+      clientX < (innerWidth - 300) / 2 ? ("left" as const) : ("right" as const),
     ];
     setWindowPosition([newVertical, newHorizontal]);
   };
@@ -55,8 +57,9 @@ export default function App() {
     <div
       className="content-view"
       style={{ display: isActive ? "flex" : "none", ...positionalStyles }}
+      draggable="true"
+      onDragEnd={drag}
     >
-      <div draggable="true" className="drag-area" onDragEnd={drag} />
       <Form page={page} />
       <Controls page={page} setPage={setPage} />
     </div>

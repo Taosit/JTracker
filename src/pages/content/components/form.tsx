@@ -71,7 +71,7 @@ export const Form = ({ page }: Props) => {
 
   console.log({ newApplication });
   return (
-    <div className="form-container">
+    <div className="form-container" draggable="false">
       <div className="form-header">
         <h1 className="title">{getTitle()}</h1>
       </div>
