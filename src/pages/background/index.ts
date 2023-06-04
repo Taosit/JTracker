@@ -16,8 +16,7 @@ chrome.runtime.onInstalled.addListener(() => {
   setStorage({
     applications: [],
     viewingApplicationId: null,
-    urls: ["https://www.linkedin.com/"],
-    showWindow: false,
+    urls: ["https://www.linkedin.com/", "https://developer.chrome.com/"],
   });
 
   chrome.contextMenus.create({
@@ -40,25 +39,37 @@ chrome.runtime.onInstalled.addListener(() => {
   });
 });
 
-type Message =
-  | {
-      event: "updateApplications";
-      data: Application[];
-    }
-  | {
-      event: "setApplicationInView";
-      data: Application | null;
-    };
-
 chrome.runtime.onMessage.addListener((message: Message) => {
   const { event, data } = message;
   let applications: ApplicationWithPrimativeDate[];
+  let applicationInProgress: ApplicationWithPrimativeDate | null;
   switch (event) {
     case "updateApplications":
       applications = data.map((application) =>
         adaptApplicationToStorage(application)
       );
       setStorage({ applications });
+      break;
+    case "setApplicationInProgress":
+      applicationInProgress = adaptApplicationToStorage(data);
+      setStorage({ applicationInProgress });
+      chrome.contextMenus.removeAll();
+      if (
+        !applicationInProgress ||
+        (!applicationInProgress.company && !applicationInProgress.link)
+      ) {
+        chrome.contextMenus.create({
+          id: "start-application",
+          title: "Start Application",
+          contexts: ["selection"],
+        });
+      } else {
+        chrome.contextMenus.create({
+          id: "add-question",
+          title: "Add Question",
+          contexts: ["selection"],
+        });
+      }
       break;
     case "setApplicationInView":
       setStorage({ viewingApplicationId: data?.id ?? null });

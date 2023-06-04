@@ -1,11 +1,122 @@
+:root {
+  --primary-dark: #1c98cd;
+  --primary-light: #b5e2f5;
+  --gray-light: #e5ebee;
+  --margin-side: 1rem;
+  --drag-area-height: 1rem;
+}
+
+h1,
+h2,
+h3,
+p,
+label,
+option,
+input,
+td,
+summary {
+  color: #353b3e;
+  font-size: 1rem;
+  margin: 0;
+  font-weight: 400;
+}
+
+button {
+  background-color: transparent;
+  border: none;
+  cursor: pointer;
+}
+
 .content-view {
-  font-size: 30px;
   position: fixed;
-  top: 0;
-  left: 0;
   width: 300px;
-  height: 300px;
+  height: calc(300px + var(--drag-area-height));
   background-color: #fff;
   z-index: 9999;
   isolation: isolate;
+  flex-direction: column;
+  border: 2px solid var(--primary-dark);
+  border-radius: 4px;
+}
+
+.drag-area {
+  width: 100%;
+  height: var(--drag-area-height);
+  background-color: var(--primary-dark);
+  cursor: move;
+  border-top-left-radius: 2px;
+  border-top-right-radius: 2px;
+}
+
+/* form */
+.form-container {
+  width: 100%;
+  flex-grow: 1;
+}
+
+.form-header {
+  width: 100%;
+  border-bottom: 2px solid var(--gray-light);
+}
+
+.form-container form {
+  padding: 0.75rem var(--margin-side);
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.title {
+  padding: 0.5rem var(--margin-side) 0;
+  color: var(--primary-dark);
+}
+
+.input-container {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.input-row {
+  width: 100%;
+  display: flex;
+  gap: 0.5rem;
+}
+
+.input-row input {
+  flex-grow: 1;
+  background-color: var(--gray-light);
+  border-radius: 2px;
+  border: none;
+}
+
+/* controls */
+
+.controls-container {
+  width: 100%;
+  background-color: var(--primary-light);
+  padding: 0.5rem var(--margin-side) 1rem;
+}
+
+.page-controls {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.page-button {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.done-button {
+  margin-top: 0.5rem;
+  display: flex;
+  gap: 0.5rem;
+  justify-content: center;
+  align-items: center;
+  background-color: var(--primary-dark);
+  color: white;
+  width: 100%;
 }

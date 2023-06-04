@@ -21,13 +21,13 @@ type Stage = "ap" | "r1" | "r2" | "r3" | "of" | "xx";
 type ApplicationStage = {
   date: Date;
   questions: Question[];
-  notes?: string;
+  notes: string;
 };
 
 type ApplicationStageWithPrimativeDate = {
   date: number;
   questions: Question[];
-  notes?: string;
+  notes: string;
 };
 
 type Interview = {
@@ -49,3 +49,28 @@ type Question = {
   question: string;
   answer: string;
 };
+
+type Message =
+  | {
+      event: "updateApplications";
+      data: Application[];
+    }
+  | {
+      event: "setApplicationInView";
+      data: Application | null;
+    }
+  | {
+      event: "startApplication";
+      data: {
+        url: string;
+        title: string;
+      };
+    }
+  | {
+      event: "setApplicationInProgress";
+      data: Application;
+    }
+  | {
+      event: "toggleWindow";
+      data: boolean;
+    };
