@@ -85,4 +85,8 @@ type Message =
   | {
       event: "toggleWindow";
       data: boolean;
+    }
+  | {
+      event: "openTab";
+      data: boolean;
     };

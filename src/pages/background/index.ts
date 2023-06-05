@@ -17,6 +17,10 @@ chrome.runtime.onInstalled.addListener(() => {
     applications: [],
     viewingApplicationId: null,
     urls: ["https://www.linkedin.com/", "https://developer.chrome.com/"],
+    currentTab: {
+      id: null,
+      toggleIsOn: false,
+    },
   });
 
   chrome.contextMenus.create({
@@ -51,73 +55,79 @@ chrome.runtime.onInstalled.addListener(() => {
   });
 });
 
-chrome.runtime.onMessage.addListener(async (message: Message) => {
-  const { event, data } = message;
-  if (event === "updateApplications") {
-    const applications = data.map((application) =>
-      adaptApplicationToStorage(application)
-    );
-    setStorage({ applications });
-    return;
-  }
-  if (event === "setApplicationInProgress") {
-    const applicationInProgress = adaptApplicationToStorage(data);
-    setStorage({ applicationInProgress });
-    chrome.contextMenus.removeAll();
-    if (
-      !applicationInProgress ||
-      (!applicationInProgress.company && !applicationInProgress.link)
-    ) {
-      chrome.contextMenus.create({
-        id: "start-application",
-        title: "Start Application",
-        contexts: ["selection"],
-      });
-    } else {
-      chrome.contextMenus.create({
-        id: "add-question",
-        title: "Add Question",
-        contexts: ["selection"],
-      });
-      const incompleteQuestion =
-        applicationInProgress.application.questions.find(
-          (question) => !question.question || !question.answer
-        );
-      if (incompleteQuestion?.question) {
+chrome.runtime.onMessage.addListener(
+  async (message: Message, sender: chrome.runtime.MessageSender) => {
+    const { event, data } = message;
+    if (event === "updateApplications") {
+      const applications = data.map((application) =>
+        adaptApplicationToStorage(application)
+      );
+      setStorage({ applications });
+      return;
+    }
+    if (event === "setApplicationInProgress") {
+      const applicationInProgress = adaptApplicationToStorage(data);
+      setStorage({ applicationInProgress });
+      chrome.contextMenus.removeAll();
+      if (
+        !applicationInProgress ||
+        (!applicationInProgress.company && !applicationInProgress.link)
+      ) {
         chrome.contextMenus.create({
-          id: "add-answer",
-          title: "Add Answer",
+          id: "start-application",
+          title: "Start Application",
           contexts: ["selection"],
         });
+      } else {
+        chrome.contextMenus.create({
+          id: "add-question",
+          title: "Add Question",
+          contexts: ["selection"],
+        });
+        const incompleteQuestion =
+          applicationInProgress.application.questions.find(
+            (question) => !question.question || !question.answer
+          );
+        if (incompleteQuestion?.question) {
+          chrome.contextMenus.create({
+            id: "add-answer",
+            title: "Add Answer",
+            contexts: ["selection"],
+          });
+        }
       }
+      return;
     }
-    return;
-  }
-  if (event === "setApplicationInView") {
-    setStorage({ viewingApplicationId: data?.id ?? null });
-    return;
-  }
-  if (event === "completeApplication") {
-    const { applications, applicationInProgress } = await getStorage([
-      "applications",
-      "applicationInProgress",
-    ]);
-    const filteredApplicationQuestions =
-      applicationInProgress.application.questions.filter(
-        (question) => question.question
-      );
-    setStorage({
-      applications: [
-        ...applications,
-        {
-          ...applicationInProgress,
-          application: {
-            ...applicationInProgress.application,
-            questions: filteredApplicationQuestions,
+    if (event === "setApplicationInView") {
+      setStorage({ viewingApplicationId: data?.id ?? null });
+      return;
+    }
+    if (event === "openTab") {
+      setStorage({ currentTab: { id: sender.tab?.id, toggleIsOn: data } });
+      return;
+    }
+    if (event === "completeApplication") {
+      const { applications, applicationInProgress } = await getStorage([
+        "applications",
+        "applicationInProgress",
+      ]);
+      const filteredApplicationQuestions =
+        applicationInProgress.application.questions.filter(
+          (question) => question.question
+        );
+      setStorage({
+        applications: [
+          ...applications,
+          {
+            ...applicationInProgress,
+            application: {
+              ...applicationInProgress.application,
+              questions: filteredApplicationQuestions,
+            },
           },
-        },
-      ],
-      applicationInProgress: null,
-    });
+        ],
+        applicationInProgress: null,
+      });
+    }
   }
-});
+);

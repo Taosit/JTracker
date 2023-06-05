@@ -1,40 +1,18 @@
-import { getStorage } from "@src/utils/storage";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Form } from "./components/Form";
 import { Controls } from "./components/Controls";
+import { useShouldShowWindow } from "./hooks/useShouldShowWindow";
 
 type windowPosition = ["top" | "bottom", "left" | "right"];
 
 export default function App() {
-  const [isActive, setIsActive] = useState(false);
   const [page, setPage] = useState(0);
   const [windowPosition, setWindowPosition] = useState<windowPosition>([
     "top",
     "left",
   ]);
 
-  useEffect(() => {
-    getStorage(["urls"]).then((storage) => {
-      if (storage.urls === undefined) return;
-      const shouldShowWindow = storage.urls.some((url) =>
-        window.location.href.includes(url)
-      );
-      setIsActive(shouldShowWindow);
-    });
-  }, []);
-
-  useEffect(() => {
-    const toggleWindowListener = (message: Message) => {
-      if (message.event === "toggleWindow") {
-        setIsActive(message.data);
-      }
-    };
-    chrome.runtime.onMessage.addListener(toggleWindowListener);
-
-    return () => {
-      chrome.runtime.onMessage.removeListener(toggleWindowListener);
-    };
-  }, []);
+  const shouldShowWindow = useShouldShowWindow();
 
   const positionalStyles = windowPosition.reduce(
     (acc, position) => ({ ...acc, [position]: 0 }),
@@ -56,7 +34,10 @@ export default function App() {
   return (
     <div
       className="content-view"
-      style={{ display: isActive ? "flex" : "none", ...positionalStyles }}
+      style={{
+        display: shouldShowWindow ? "flex" : "none",
+        ...positionalStyles,
+      }}
       draggable="true"
       onDragEnd={drag}
     >

@@ -3,6 +3,10 @@ export interface LocalStorage {
   viewingApplicationId: string | null;
   urls: string[];
   applicationInProgress: ApplicationWithPrimativeDate;
+  currentTab: {
+    id: number;
+    toggleIsOn: boolean;
+  };
 }
 
 export const setStorage = (obj: Partial<LocalStorage>) => {

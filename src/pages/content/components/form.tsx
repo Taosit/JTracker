@@ -4,7 +4,7 @@ import { NoteField } from "./NoteField";
 import { startApplication, addQuestion, addAnswer } from "@src/utils/helpers";
 import { useNewApplication } from "../contexts/NewApplicationContext";
 import { useApplicationTransformer } from "../hooks/useApplicationTransformer";
-import { useRegisterMessageListener } from "../hooks/UseRegisterMessageListener";
+import { useRegisterMessageListener } from "../hooks/useRegisterMessageListener";
 
 type Props = {
   page: number;
