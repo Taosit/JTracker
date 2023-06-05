@@ -19,6 +19,7 @@ export const applicationData: Application[] = [
             "I like skiing in winter. In summer I like to go to the beach and go out with friends.",
         },
       ],
+      notes: "",
     },
     interviews: [
       {
@@ -70,6 +71,7 @@ export const applicationData: Application[] = [
           answer: "My name is John Doe",
         },
       ],
+      notes: "",
     },
     interviews: [],
   },
@@ -81,6 +83,7 @@ export const applicationData: Application[] = [
     application: {
       date: new Date(new Date().setDate(new Date().getDate() - 1)),
       questions: [],
+      notes: "",
     },
     interviews: [],
   },

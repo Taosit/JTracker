@@ -1,67 +1,25 @@
-import React, { useEffect, useState } from "react";
-import { GeneralFields } from "./generalFields";
-import { QuestionFields } from "./questionFields";
-import { NoteField } from "./noteField";
-import { getStorage } from "@src/utils/storage";
-import { adaptApplicationFromStorage } from "@src/utils/helpers";
+import { GeneralFields } from "./GeneralFields";
+import { QuestionFields } from "./QuestionFields";
+import { NoteField } from "./NoteField";
+import { startApplication, addQuestion, addAnswer } from "@src/utils/helpers";
+import { useNewApplication } from "../contexts/NewApplicationContext";
+import { useApplicationTransformer } from "../hooks/useApplicationTransformer";
+import { useRegisterMessageListener } from "../hooks/UseRegisterMessageListener";
 
 type Props = {
   page: number;
 };
 
 export const Form = ({ page }: Props) => {
-  const initialApplication = {
-    id: crypto.getRandomValues(new Uint32Array(1))[0].toString(16),
-    company: "",
-    link: "",
-    stage: "ap" as const,
-    application: {
-      date: new Date(),
-      questions: [],
-      notes: "",
-    },
-    interviews: [],
-  };
+  const { newApplication } = useNewApplication();
 
-  const [newApplication, setNewApplication] =
-    useState<Application>(initialApplication);
+  const startApplicationListener = useApplicationTransformer(startApplication);
+  const addQuestionListener = useApplicationTransformer(addQuestion);
+  const addAnswerListener = useApplicationTransformer(addAnswer);
 
-  useEffect(() => {
-    getStorage(["applicationInProgress"]).then((storage) => {
-      if (!storage.applicationInProgress) return;
-      const application = adaptApplicationFromStorage(
-        storage.applicationInProgress
-      );
-      setNewApplication(application);
-    });
-  }, []);
-
-  useEffect(() => {
-    const startApplicationListener = (message: Message) => {
-      if (message.event === "startApplication") {
-        const { title, url } = message.data;
-        const application = { ...newApplication, company: title, link: url };
-        setNewApplication(application);
-        chrome.runtime.sendMessage({
-          event: "setApplicationInProgress",
-          data: application,
-        });
-      }
-    };
-    chrome.runtime.onMessage.addListener(startApplicationListener);
-
-    return () => {
-      chrome.runtime.onMessage.removeListener(startApplicationListener);
-    };
-  }, []);
-
-  const updateNewApplication = (application: Application) => {
-    setNewApplication(application);
-    chrome.runtime.sendMessage({
-      event: "setApplicationInProgress",
-      data: application,
-    });
-  };
+  useRegisterMessageListener(startApplicationListener);
+  useRegisterMessageListener(addQuestionListener);
+  useRegisterMessageListener(addAnswerListener);
 
   const getTitle = () => {
     if (!newApplication) return "";
@@ -69,31 +27,15 @@ export const Form = ({ page }: Props) => {
     return newApplication.company || "New Application";
   };
 
-  console.log({ newApplication });
   return (
     <div className="form-container" draggable="false">
       <div className="form-header">
         <h1 className="title">{getTitle()}</h1>
       </div>
       <form>
-        {page === 0 && (
-          <GeneralFields
-            newApplication={newApplication}
-            updateNewApplication={updateNewApplication}
-          />
-        )}
-        {page === 1 && (
-          <QuestionFields
-            newApplication={newApplication}
-            updateNewApplication={updateNewApplication}
-          />
-        )}
-        {page === 2 && (
-          <NoteField
-            newApplication={newApplication}
-            updateNewApplication={updateNewApplication}
-          />
-        )}
+        {page === 0 && <GeneralFields />}
+        {page === 1 && <QuestionFields />}
+        {page === 2 && <NoteField />}
       </form>
     </div>
   );

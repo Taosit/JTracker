@@ -1,14 +1,9 @@
-import { InputGroup } from "./inputGroup";
+import { useNewApplication } from "../contexts/NewApplicationContext";
+import { InputGroup } from "./InputGroup";
 
-type Props = {
-  newApplication: Application;
-  updateNewApplication: (application: Application) => void;
-};
+export const GeneralFields = () => {
+  const { newApplication, updateNewApplication } = useNewApplication();
 
-export const GeneralFields = ({
-  newApplication,
-  updateNewApplication,
-}: Props) => {
   return (
     <>
       <InputGroup
@@ -17,9 +12,6 @@ export const GeneralFields = ({
         onChange={(value) =>
           updateNewApplication({ ...newApplication, company: value })
         }
-        onDelete={() =>
-          updateNewApplication({ ...newApplication, company: "" })
-        }
       />
       <InputGroup
         label="Link"
@@ -27,7 +19,6 @@ export const GeneralFields = ({
         onChange={(value) =>
           updateNewApplication({ ...newApplication, link: value })
         }
-        onDelete={() => updateNewApplication({ ...newApplication, link: "" })}
       />
     </>
   );

@@ -1,5 +1,5 @@
 import { adaptApplicationToStorage } from "@src/utils/helpers";
-import { setStorage } from "@src/utils/storage";
+import { getStorage, setStorage } from "@src/utils/storage";
 import reloadOnUpdate from "virtual:reload-on-update-in-background-script";
 
 reloadOnUpdate("pages/background");
@@ -27,7 +27,6 @@ chrome.runtime.onInstalled.addListener(() => {
 
   chrome.contextMenus.onClicked.addListener((info, tab) => {
     if (info.menuItemId === "start-application") {
-      console.log(info.selectionText, tab.url);
       chrome.tabs.sendMessage(tab.id, {
         event: "startApplication",
         data: {
@@ -35,44 +34,90 @@ chrome.runtime.onInstalled.addListener(() => {
           title: info.selectionText,
         },
       });
+      return;
+    }
+    if (info.menuItemId === "add-question") {
+      chrome.tabs.sendMessage(tab.id, {
+        event: "addQuestion",
+        data: info.selectionText,
+      });
+    }
+    if (info.menuItemId === "add-answer") {
+      chrome.tabs.sendMessage(tab.id, {
+        event: "addAnswer",
+        data: info.selectionText,
+      });
     }
   });
 });
 
-chrome.runtime.onMessage.addListener((message: Message) => {
+chrome.runtime.onMessage.addListener(async (message: Message) => {
   const { event, data } = message;
-  let applications: ApplicationWithPrimativeDate[];
-  let applicationInProgress: ApplicationWithPrimativeDate | null;
-  switch (event) {
-    case "updateApplications":
-      applications = data.map((application) =>
-        adaptApplicationToStorage(application)
-      );
-      setStorage({ applications });
-      break;
-    case "setApplicationInProgress":
-      applicationInProgress = adaptApplicationToStorage(data);
-      setStorage({ applicationInProgress });
-      chrome.contextMenus.removeAll();
-      if (
-        !applicationInProgress ||
-        (!applicationInProgress.company && !applicationInProgress.link)
-      ) {
+  if (event === "updateApplications") {
+    const applications = data.map((application) =>
+      adaptApplicationToStorage(application)
+    );
+    setStorage({ applications });
+    return;
+  }
+  if (event === "setApplicationInProgress") {
+    const applicationInProgress = adaptApplicationToStorage(data);
+    setStorage({ applicationInProgress });
+    chrome.contextMenus.removeAll();
+    if (
+      !applicationInProgress ||
+      (!applicationInProgress.company && !applicationInProgress.link)
+    ) {
+      chrome.contextMenus.create({
+        id: "start-application",
+        title: "Start Application",
+        contexts: ["selection"],
+      });
+    } else {
+      chrome.contextMenus.create({
+        id: "add-question",
+        title: "Add Question",
+        contexts: ["selection"],
+      });
+      const incompleteQuestion =
+        applicationInProgress.application.questions.find(
+          (question) => !question.question || !question.answer
+        );
+      if (incompleteQuestion?.question) {
         chrome.contextMenus.create({
-          id: "start-application",
-          title: "Start Application",
-          contexts: ["selection"],
-        });
-      } else {
-        chrome.contextMenus.create({
-          id: "add-question",
-          title: "Add Question",
+          id: "add-answer",
+          title: "Add Answer",
           contexts: ["selection"],
         });
       }
-      break;
-    case "setApplicationInView":
-      setStorage({ viewingApplicationId: data?.id ?? null });
-      break;
+    }
+    return;
+  }
+  if (event === "setApplicationInView") {
+    setStorage({ viewingApplicationId: data?.id ?? null });
+    return;
+  }
+  if (event === "completeApplication") {
+    const { applications, applicationInProgress } = await getStorage([
+      "applications",
+      "applicationInProgress",
+    ]);
+    const filteredApplicationQuestions =
+      applicationInProgress.application.questions.filter(
+        (question) => question.question
+      );
+    setStorage({
+      applications: [
+        ...applications,
+        {
+          ...applicationInProgress,
+          application: {
+            ...applicationInProgress.application,
+            questions: filteredApplicationQuestions,
+          },
+        },
+      ],
+      applicationInProgress: null,
+    });
   }
 });

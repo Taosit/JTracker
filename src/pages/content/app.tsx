@@ -1,7 +1,7 @@
 import { getStorage } from "@src/utils/storage";
 import { useEffect, useState } from "react";
-import { Controls } from "@src/pages/content/components/controls";
 import { Form } from "./components/Form";
+import { Controls } from "./components/Controls";
 
 type windowPosition = ["top" | "bottom", "left" | "right"];
 

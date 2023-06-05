@@ -67,8 +67,20 @@ type Message =
       };
     }
   | {
+      event: "addQuestion";
+      data: string;
+    }
+  | {
+      event: "addAnswer";
+      data: string;
+    }
+  | {
       event: "setApplicationInProgress";
       data: Application;
+    }
+  | {
+      event: "completeApplication";
+      data: null;
     }
   | {
       event: "toggleWindow";

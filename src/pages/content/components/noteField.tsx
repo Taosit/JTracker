@@ -1,10 +1,20 @@
-import React from "react";
+import { useNewApplication } from "../contexts/NewApplicationContext";
+import { InputGroup } from "./InputGroup";
 
-type Props = {
-  newApplication: Application;
-  updateNewApplication: (application: Application) => void;
-};
+export const NoteField = () => {
+  const { newApplication, updateNewApplication } = useNewApplication();
 
-export const NoteField = ({ newApplication, updateNewApplication }: Props) => {
-  return <div>noteField</div>;
+  return (
+    <InputGroup
+      label="Notes"
+      value={newApplication.application.notes}
+      onChange={(notes) =>
+        updateNewApplication({
+          ...newApplication,
+          application: { ...newApplication.application, notes },
+        })
+      }
+      multiline
+    />
+  );
 };

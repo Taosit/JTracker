@@ -1,4 +1,4 @@
-import React from "react";
+import { useNewApplication } from "../contexts/NewApplicationContext";
 
 type Props = {
   page: number;
@@ -6,7 +6,17 @@ type Props = {
 };
 
 export const Controls = ({ page, setPage }: Props) => {
+  const { newApplication } = useNewApplication();
+
   const pageOrder = ["general", "questions", "notes"];
+
+  const completeApplication = () => {
+    chrome.runtime.sendMessage({
+      event: "completeApplication",
+    });
+  };
+
+  const isDisabled = !newApplication?.company || !newApplication?.link;
 
   return (
     <div className="controls-container" draggable="false">
@@ -38,7 +48,11 @@ export const Controls = ({ page, setPage }: Props) => {
           />
         </button>
       </div>
-      <button className="done-button">
+      <button
+        className="done-button"
+        onClick={completeApplication}
+        disabled={isDisabled}
+      >
         <img
           src="https://res.cloudinary.com/del89ro4h/image/upload/v1685747681/done_nk2nku.svg"
           alt="done"
