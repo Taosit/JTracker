@@ -11,9 +11,15 @@ export const Form = () => {
   const { newApplication } = useNewApplication();
   const { page } = usePage();
 
-  const startApplicationListener = useApplicationTransformer(startApplication);
-  const addQuestionListener = useApplicationTransformer(addQuestion);
-  const addAnswerListener = useApplicationTransformer(addAnswer);
+  const startApplicationListener = useApplicationTransformer(
+    "startApplication",
+    startApplication
+  );
+  const addQuestionListener = useApplicationTransformer(
+    "addQuestion",
+    addQuestion
+  );
+  const addAnswerListener = useApplicationTransformer("addAnswer", addAnswer);
 
   useRegisterMessageListener(startApplicationListener);
   useRegisterMessageListener(addQuestionListener);

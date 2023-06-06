@@ -1,95 +1,38 @@
 <div align="center">
-<img src="public/icon-128.png" alt="logo"/>
-<h1> Chrome Extension Boilerplate with<br/>React + Vite + TypeScript</h1>
+<h1> Job Application Tracker</h1>
 
-![](https://img.shields.io/badge/React-61DAFB?style=flat-square&logo=react&logoColor=black)
-![](https://img.shields.io/badge/Typescript-3178C6?style=flat-square&logo=typescript&logoColor=white)
-![](https://badges.aleen42.com/src/vitejs.svg)
-![GitHub action badge](https://github.com/Jonghakseo/chrome-extension-boilerplate-react-vite/actions/workflows/build-zip.yml/badge.svg)
-<img src="https://hits.seeyoufarm.com/api/count/incr/badge.svg?url=https://github.com/Jonghakseo/chrome-extension-boilerplate-react-viteFactions&count_bg=%23#222222&title_bg=%23#454545&title=😀&edge_flat=true" alt="hits"/>
-
-
-> This project is listed in the [Awesome Vite](https://github.com/vitejs/awesome-vite)
+> This project is bundled using [Chrome Extension Boilerplate React Vite](https://github.com/Jonghakseo/chrome-extension-boilerplate-react-vite)
 
 </div>
 
-## Table of Contents
+## Intro
 
-- [Intro](#intro)
-- [Features](#features)
-- [Installation](#installation)
-  - [Procedures](#procedures)
-- [Screenshots](#screenshots)
-  - [NewTab](#newtab)
-  - [Popup](#popup)  
-- [Sample](#sample)
-- [Documents](#documents)
+This chrome extension helps to keep track of online job applications.
 
-## Intro <a name="intro"></a>
-This boilerplate is made for creating chrome extensions using React and Typescript.
-> The focus was on improving the build speed and development experience with Vite.
+To create an application, you can simply select the company name on any site and right click to find the extension menu, which will activate a draggable window injected into the site you are viewing. You can also add questions and answers from the extension menu after an application is started. Your applications can be viewed and managed by clicking on the extension icon to activate the popup. You can add some job websites on the option page by right clicking on the extension icon, so that the injected window will be shown by default on these sites.
 
-## Features <a name="features"></a>
-- [React 18](https://reactjs.org/)
-- [TypeScript](https://www.typescriptlang.org/)
-- [Jest](https://jestjs.io/)
-- [React Testing Library](https://testing-library.com/docs/react-testing-library/intro/)
-- [Vite](https://vitejs.dev/)
-- [SASS](https://sass-lang.com/)
-- [ESLint](https://eslint.org/)
-- [Prettier](https://prettier.io/)
-- [Chrome Extension Manifest Version 3](https://developer.chrome.com/docs/extensions/mv3/intro/)
-- HRR(Hot Rebuild & Refresh/Reload)
+## Features
 
-## Installation <a name="installation"></a>
+### Any page in the Chrome browser (except for a few reserved pages)
 
-### Procedures <a name="procedures"></a>
-1. Clone this repository.
-2. Change `name` and `description` in package.json => **Auto synchronize with manifest** 
-3. Run `yarn install` or `npm i` (check your node version >= 16.6, recommended >= 18)
-4. Run `yarn dev` or `npm run dev`
-5. Load Extension on Chrome
-   1. Open - Chrome browser
-   2. Access - chrome://extensions
-   3. Check - Developer mode
-   4. Find - Load unpacked extension
-   5. Select - `dist` folder in this project (after dev or build)
-6. If you want to build in production, Just run `yarn build` or `npm run build`.
+- Start an application by selecting a company name with mouse cursor and clicking on "Start Application" on the content menu to fill in the company name and the link on the injected window.
+- Add a question on the injected window by selecting a question with mouse cursor and clicking "Add Question" on the content menu.
+- Add an answet on the injected window by selecting an answer with mouse cursor and clicking "Add Answer" on the content menu.
+- Edit any fields on the injected window and add some notes.
+- Complete the application by clicking the Done button.
+- Drag the blue bar at the top of the window to drag it anywhere within the page.
 
-## Screenshots <a name="screenshots"></a>
+### Popup Page
 
-### New Tab <a name="newtab"></a>
+- Toggle show window to show or hide the injected window on the current site.
+- See an overview and a list of all applications.
+- Search an application by company name or question keywords.
+- Sort applications by application dates or stages.
+- Advance the stage of an application or set it to rejected or accepted.
+- View the details of an application, add and edit questions and notes for the initial application stage, and different interview stages if applicable.
+- Add and edit interview dates if applicable
 
-<img width="971" src="https://user-images.githubusercontent.com/53500778/162631646-cd40976b-b737-43d0-8e6a-6ac090a2e2d4.png">
+### Option Page
 
-### Popup <a name="popup"></a>
-
-<img width="314" alt="popup" src="https://user-images.githubusercontent.com/53500778/203561728-23517d46-12e3-4139-8a4f-e0b2f22a6ab3.png">
-
-## Sample <a name="sample"></a>
-- https://github.com/Jonghakseo/drag-gpt-extension
-
-## Documents <a name="documents"></a>
-- [Vite Plugin](https://vitejs.dev/guide/api-plugin.html)
-- [ChromeExtension](https://developer.chrome.com/docs/extensions/mv3/)
-- [Rollup](https://rollupjs.org/guide/en/)
-- [Rollup-plugin-chrome-extension](https://www.extend-chrome.dev/rollup-plugin)
-
-
-## Star History
-
-[![Star History Chart](https://api.star-history.com/svg?repos=Jonghakseo/chrome-extension-boilerplate-react-vite&type=Date)](https://star-history.com/#Jonghakseo/chrome-extension-boilerplate-react-vite&Date)
-
-
-
----
-## Thanks To
-
-| [Jetbrains](https://jb.gg/OpenSourceSupport)                                                                           | [Jackson Hong](https://www.linkedin.com/in/j-acks0n/)                                            |
-|--------------------------------------------------------------------------------------------------------------------------------------------|--------------------------------------------------------------------------------------------------|
-| <img width="100" src="https://resources.jetbrains.com/storage/products/company/brand/logos/jb_beam.png" alt="JetBrains Logo (Main) logo."> | <img width="100" src='https://avatars.githubusercontent.com/u/23139754?v=4' alt='Jackson Hong'/> |
-
-
----
-
-[Jonghakseo](https://nookpi.tistory.com/)
+- Add and edit website urls where the injected window is shown by default.
+- Toggle if applications are automatically set to rejected after 30 days in the initial applied stage.

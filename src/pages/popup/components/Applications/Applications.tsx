@@ -99,7 +99,7 @@ export const Applications = () => {
       <table className={styles.table}>
         <tr>
           <th>Company</th>
-          <th>Status</th>
+          <th>Stage</th>
           <th>App. Date</th>
         </tr>
         {filteredAndSortedApplications.map((application) => (
