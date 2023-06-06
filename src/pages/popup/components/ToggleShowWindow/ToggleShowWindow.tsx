@@ -12,6 +12,11 @@ export const ToggleShowWindow = () => {
           type="checkbox"
           checked={shouldShowWindow}
           onChange={toggleWindow}
+          onKeyDown={(e) => {
+            if (e.key === "Enter") {
+              toggleWindow();
+            }
+          }}
           className={styles.checkbox}
         />
         <span className={styles.slider}></span>

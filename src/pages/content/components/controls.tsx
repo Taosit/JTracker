@@ -1,12 +1,9 @@
 import { useNewApplication } from "../contexts/NewApplicationContext";
+import { usePage } from "../contexts/PageContext";
 
-type Props = {
-  page: number;
-  setPage: (page: number) => void;
-};
-
-export const Controls = ({ page, setPage }: Props) => {
-  const { newApplication } = useNewApplication();
+export const Controls = () => {
+  const { newApplication, initializeNewApplication } = useNewApplication();
+  const { page, setPage } = usePage();
 
   const pageOrder = ["general", "questions", "notes"];
 
@@ -14,6 +11,8 @@ export const Controls = ({ page, setPage }: Props) => {
     chrome.runtime.sendMessage({
       event: "completeApplication",
     });
+    initializeNewApplication();
+    setPage(0);
   };
 
   const isDisabled = !newApplication?.company || !newApplication?.link;

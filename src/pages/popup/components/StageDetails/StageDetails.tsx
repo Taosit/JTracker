@@ -221,9 +221,11 @@ export const StageDetails = ({ stage }: Props) => {
             ))}
           </ol>
         )}
-        <div className={styles.buttons}>
-          <button onClick={addQuestion}>Add Question</button>
-        </div>
+        {!editingQuestion && (
+          <div className={styles.buttons}>
+            <button onClick={addQuestion}>Add Question</button>
+          </div>
+        )}
         <div className={styles.note}>
           {isEditingNote ? (
             <textarea

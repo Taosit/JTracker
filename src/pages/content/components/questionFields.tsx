@@ -29,7 +29,7 @@ export const QuestionFields = () => {
   return (
     <div className="questions">
       {newApplication.application.questions.map((question, index) => (
-        <div key={question.id} className="question-pair">
+        <div key={question.id} className="question-answer-pair">
           <InputGroup
             label={`${index + 1}. Question`}
             value={question.question}

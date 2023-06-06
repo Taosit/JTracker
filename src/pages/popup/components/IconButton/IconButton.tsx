@@ -6,6 +6,7 @@ type Props = {
   altText: string;
   onClick: () => void;
   className?: string;
+  disabled?: boolean;
 };
 
 export const IconButton = ({
@@ -13,6 +14,7 @@ export const IconButton = ({
   altText,
   onClick,
   className = "",
+  disabled = false,
 }: Props) => {
   const handleKeyDown = (event: React.KeyboardEvent<HTMLButtonElement>) => {
     if (event.key === "Enter" || event.key === " ") {
@@ -32,6 +34,7 @@ export const IconButton = ({
       className={styles.iconButton}
       onClick={handleClick}
       onKeyDown={handleKeyDown}
+      disabled={disabled}
     >
       <img src={imageUrl} alt={altText} className={className} />
       <span className={styles.tooltip} aria-hidden>

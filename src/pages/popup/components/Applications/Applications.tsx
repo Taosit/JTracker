@@ -131,6 +131,7 @@ export const Applications = () => {
                     onClick={() =>
                       updateAndSaveApplications(application, rejectApplication)
                     }
+                    disabled={application.stage === "xx"}
                   />
                   <p>{application.stage.toUpperCase()}</p>
                   <IconButton
@@ -140,11 +141,19 @@ export const Applications = () => {
                     onClick={() =>
                       updateAndSaveApplications(application, advanceApplication)
                     }
+                    disabled={
+                      application.stage === "xx" ||
+                      application.stage === "of" ||
+                      application.stage === "r3"
+                    }
                   />
                 </div>
                 <button
                   onClick={() =>
                     updateAndSaveApplications(application, acceptApplication)
+                  }
+                  disabled={
+                    application.stage === "of" || application.stage === "xx"
                   }
                 >
                   Offer

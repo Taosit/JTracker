@@ -17,6 +17,7 @@ chrome.runtime.onInstalled.addListener(() => {
     applications: [],
     viewingApplicationId: null,
     urls: ["https://www.linkedin.com/", "https://developer.chrome.com/"],
+    applicationInProgress: null,
     currentTab: {
       id: null,
       toggleIsOn: false,
@@ -38,6 +39,12 @@ chrome.runtime.onInstalled.addListener(() => {
           title: info.selectionText,
         },
       });
+      chrome.tabs.sendMessage(tab.id, {
+        event: "openWindow",
+        data: {
+          page: 0,
+        },
+      });
       return;
     }
     if (info.menuItemId === "add-question") {
@@ -45,11 +52,24 @@ chrome.runtime.onInstalled.addListener(() => {
         event: "addQuestion",
         data: info.selectionText,
       });
+      chrome.tabs.sendMessage(tab.id, {
+        event: "openWindow",
+        data: {
+          page: 1,
+        },
+      });
+      return;
     }
     if (info.menuItemId === "add-answer") {
       chrome.tabs.sendMessage(tab.id, {
         event: "addAnswer",
         data: info.selectionText,
+      });
+      chrome.tabs.sendMessage(tab.id, {
+        event: "openWindow",
+        data: {
+          page: 1,
+        },
       });
     }
   });

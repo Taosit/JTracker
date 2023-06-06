@@ -37,6 +37,12 @@ button {
   font-size: 1.125rem;
 }
 
+button:disabled {
+  filter: grayscale(0.5);
+  opacity: 0.8;
+  cursor: auto;
+}
+
 .app {
   width: 600px;
   height: 400px;

@@ -99,6 +99,17 @@
   overflow: hidden;
   text-overflow: ellipsis;
   text-decoration: none;
+  border-radius: 2px;
+}
+
+.companyLink a:focus-visible,
+.companyLink a:hover {
+  text-decoration: underline;
+  outline: none;
+}
+
+.companyLink:has(a:focus-visible) {
+  outline: 2px solid var(--primary-dark);
 }
 
 .statusCell {

@@ -3,32 +3,56 @@ import { Form } from "./components/Form";
 import { Controls } from "./components/Controls";
 import { useShouldShowWindow } from "./hooks/useShouldShowWindow";
 
-type windowPosition = ["top" | "bottom", "left" | "right"];
-
 export default function App() {
-  const [page, setPage] = useState(0);
-  const [windowPosition, setWindowPosition] = useState<windowPosition>([
-    "top",
-    "left",
+  const [windowPosition, setWindowPosition] = useState<[number, number]>([
+    0, 0,
   ]);
 
   const shouldShowWindow = useShouldShowWindow();
 
-  const positionalStyles = windowPosition.reduce(
-    (acc, position) => ({ ...acc, [position]: 0 }),
-    {}
-  );
+  const dragFactory = (
+    startX: number,
+    startY: number,
+    lastWindowPosition: [number, number]
+  ) => {
+    return function (this: Window, e: MouseEvent) {
+      const { clientX, clientY } = e;
+      const [lastWindowX, lastWindowY] = lastWindowPosition;
+      const [newX, newY] = [
+        lastWindowX + clientX - startX,
+        lastWindowY + clientY - startY,
+      ];
 
-  const drag = (e: React.DragEvent<HTMLDivElement>) => {
+      const { innerWidth, innerHeight } = window;
+      const [windowWidth, windowHeight] = [300, 320];
+      const [maxX, maxY] = [
+        innerWidth - windowWidth,
+        innerHeight - windowHeight,
+      ];
+
+      const [minX, minY] = [0, 0];
+
+      const [finalX, finalY] = [
+        Math.max(minX, Math.min(maxX, newX)),
+        Math.max(minY, Math.min(maxY, newY)),
+      ];
+      setWindowPosition([finalX, finalY]);
+    };
+  };
+
+  const stopDragFactory = (drag: (e: MouseEvent) => void) => {
+    return function stopDrag(this: Window) {
+      window.removeEventListener("mousemove", drag);
+      window.removeEventListener("mouseup", stopDrag);
+    };
+  };
+
+  const startDrag = (e: React.MouseEvent<HTMLDivElement>) => {
     const { clientX, clientY } = e;
-    const { innerWidth, innerHeight } = window;
-    const [newVertical, newHorizontal] = [
-      clientY < (innerHeight - 300) / 2
-        ? ("top" as const)
-        : ("bottom" as const),
-      clientX < (innerWidth - 300) / 2 ? ("left" as const) : ("right" as const),
-    ];
-    setWindowPosition([newVertical, newHorizontal]);
+    const drag = dragFactory(clientX, clientY, windowPosition);
+    const stopDrag = stopDragFactory(drag);
+    window.addEventListener("mousemove", drag);
+    window.addEventListener("mouseup", stopDrag);
   };
 
   return (
@@ -36,13 +60,13 @@ export default function App() {
       className="content-view"
       style={{
         display: shouldShowWindow ? "flex" : "none",
-        ...positionalStyles,
+        top: windowPosition[1],
+        left: windowPosition[0],
       }}
-      draggable="true"
-      onDragEnd={drag}
     >
-      <Form page={page} />
-      <Controls page={page} setPage={setPage} />
+      <div className="drag-area" onMouseDown={startDrag} />
+      <Form />
+      <Controls />
     </div>
   );
 }

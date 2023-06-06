@@ -5,13 +5,11 @@ import { startApplication, addQuestion, addAnswer } from "@src/utils/helpers";
 import { useNewApplication } from "../contexts/NewApplicationContext";
 import { useApplicationTransformer } from "../hooks/useApplicationTransformer";
 import { useRegisterMessageListener } from "../hooks/useRegisterMessageListener";
+import { usePage } from "../contexts/PageContext";
 
-type Props = {
-  page: number;
-};
-
-export const Form = ({ page }: Props) => {
+export const Form = () => {
   const { newApplication } = useNewApplication();
+  const { page } = usePage();
 
   const startApplicationListener = useApplicationTransformer(startApplication);
   const addQuestionListener = useApplicationTransformer(addQuestion);

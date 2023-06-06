@@ -14,6 +14,7 @@ import {
 type NewApplicationContextType = {
   newApplication: Application;
   updateNewApplication: (application: Application) => void;
+  initializeNewApplication: () => void;
 };
 
 const NewApplicationContext = createContext<NewApplicationContextType | null>(
@@ -67,11 +68,16 @@ export const NewApplicationContextProvider = ({
     });
   };
 
+  const initializeNewApplication = () => {
+    setNewApplication(initialApplication);
+  };
+
   return (
     <NewApplicationContext.Provider
       value={{
         newApplication,
         updateNewApplication,
+        initializeNewApplication,
       }}
     >
       {children}

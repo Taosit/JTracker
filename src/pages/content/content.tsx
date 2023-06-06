@@ -2,6 +2,7 @@ import { createRoot } from "react-dom/client";
 import App from "@src/pages/content/app";
 import refreshOnUpdate from "virtual:reload-on-update-in-view";
 import { NewApplicationContextProvider } from "./contexts/NewApplicationContext";
+import { PageContextProvider } from "./contexts/PageContext";
 
 refreshOnUpdate("pages/content");
 
@@ -11,6 +12,8 @@ document.body.append(root);
 
 createRoot(root).render(
   <NewApplicationContextProvider>
-    <App />
+    <PageContextProvider>
+      <App />
+    </PageContextProvider>
   </NewApplicationContextProvider>
 );

@@ -89,4 +89,10 @@ type Message =
   | {
       event: "openTab";
       data: boolean;
+    }
+  | {
+      event: "openWindow";
+      data: {
+        page: number;
+      };
     };

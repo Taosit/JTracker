@@ -8,7 +8,6 @@ import { useApplication } from "../../contexts/ApplicationContext";
 
 const StatisticsRaw = () => {
   const { applications } = useApplication();
-  const numApplications = applications.length;
 
   const getNumOfApplicationsByStage = useCallback(
     (stage: Stage) => {
@@ -18,6 +17,7 @@ const StatisticsRaw = () => {
     [applications]
   );
 
+  const numApplications = getNumOfApplicationsByStage("ap");
   const numRejected = getNumOfApplicationsByStage("xx");
   const numRound1 = getNumOfApplicationsByStage("r1");
   const numRound2 = getNumOfApplicationsByStage("r2");

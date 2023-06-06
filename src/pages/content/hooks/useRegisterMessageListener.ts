@@ -1,13 +1,13 @@
 import { useEffect } from "react";
 
 export const useRegisterMessageListener = (
-  listner: (message: Message) => void
+  listener: (message: Message) => void
 ) => {
   useEffect(() => {
-    chrome.runtime.onMessage.addListener(listner);
+    chrome.runtime.onMessage.addListener(listener);
 
     return () => {
-      chrome.runtime.onMessage.removeListener(listner);
+      chrome.runtime.onMessage.removeListener(listener);
     };
-  }, [listner]);
+  }, [listener]);
 };

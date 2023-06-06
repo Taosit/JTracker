@@ -47,7 +47,7 @@ export const ApplicationContextProvider = ({ children }: PropsWithChildren) => {
   };
 
   const rejectApplication = (application: Application) => {
-    if (application.stage === "of" || application.stage === "xx") {
+    if (application.stage === "xx") {
       return;
     }
     const updatedApplication = {

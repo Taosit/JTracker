@@ -10,15 +10,14 @@
 .iconButton img {
   width: 30px;
   height: 30px;
-  cursor: pointer;
 }
 
 .tooltip {
   display: none;
 }
 
-.iconButton:hover .tooltip,
-.iconButton:focus-visible .tooltip {
+.iconButton:hover:not(:disabled) .tooltip,
+.iconButton:focus-visible:not(:disabled) .tooltip {
   white-space: nowrap;
   display: block;
   position: absolute;
@@ -31,4 +30,9 @@
   color: var(--text-light);
   background-color: white;
   z-index: 1;
+}
+
+.iconButton:disabled {
+  cursor: auto;
+  opacity: 0.7;
 }
