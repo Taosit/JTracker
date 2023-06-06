@@ -2,9 +2,12 @@ import React, {
   createContext,
   PropsWithChildren,
   useContext,
+  useEffect,
   useState,
 } from "react";
 import { applicationData } from "../seeds";
+import { getStorage } from "@src/utils/storage";
+import { adaptApplicationFromStorage } from "@src/utils/helpers";
 
 type ApplicationContextType = {
   applications: Application[];
@@ -13,7 +16,6 @@ type ApplicationContextType = {
   advanceApplication: (application: Application) => undefined | Application[];
   acceptApplication: (application: Application) => undefined | Application[];
   setviewingApplicationId: React.Dispatch<React.SetStateAction<string | null>>;
-  retrieveApplications: (applications: Application[]) => void;
   updateStageDetails: (
     applicationId: string,
     stage: ApplicationStage | Interview
@@ -39,6 +41,53 @@ export const ApplicationContextProvider = ({ children }: PropsWithChildren) => {
   >(null);
 
   const stageOrder = ["xx", "ap", "r1", "r2", "r3", "of"] as const;
+
+  const is30DaysOld = (date: Date) => {
+    const today = new Date();
+    const thirtyDaysAgo = new Date();
+    thirtyDaysAgo.setDate(today.getDate() - 30);
+    return date < thirtyDaysAgo;
+  };
+
+  const rejectOldApplications = (rawApplications: Application[]) => {
+    const updatedApplications = rawApplications.map((application) => {
+      if (
+        application.stage === "ap" &&
+        is30DaysOld(application.application.date)
+      ) {
+        return {
+          ...application,
+          stage: "xx" as const,
+        };
+      }
+      return application;
+    });
+    return updatedApplications;
+  };
+
+  useEffect(() => {
+    getStorage(["applications", "viewingApplicationId", "autoReject"]).then(
+      (storage) => {
+        setviewingApplicationId(storage.viewingApplicationId);
+        if (!storage.applications.length) {
+          setApplications(applicationData);
+          return;
+        }
+
+        let updatedApplication = storage.applications.map((application) =>
+          adaptApplicationFromStorage(application)
+        );
+        if (storage.autoReject) {
+          updatedApplication = rejectOldApplications(updatedApplication);
+          chrome.runtime.sendMessage({
+            event: "updateApplications",
+            data: updatedApplication,
+          });
+        }
+        setApplications(updatedApplication);
+      }
+    );
+  }, []);
 
   const isInterview = (
     stage: ApplicationStage | Interview
@@ -140,10 +189,6 @@ export const ApplicationContextProvider = ({ children }: PropsWithChildren) => {
     return updatedApplications;
   };
 
-  const retrieveApplications = (applications: Application[]) => {
-    setApplications(applications);
-  };
-
   return (
     <ApplicationContext.Provider
       value={{
@@ -153,7 +198,6 @@ export const ApplicationContextProvider = ({ children }: PropsWithChildren) => {
         advanceApplication,
         acceptApplication,
         setviewingApplicationId,
-        retrieveApplications,
         updateStageDetails,
       }}
     >

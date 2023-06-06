@@ -22,6 +22,7 @@ chrome.runtime.onInstalled.addListener(() => {
       id: null,
       toggleIsOn: false,
     },
+    autoReject: false,
   });
 
   chrome.contextMenus.create({
@@ -147,6 +148,12 @@ chrome.runtime.onMessage.addListener(
           },
         ],
         applicationInProgress: null,
+      });
+      chrome.contextMenus.removeAll();
+      chrome.contextMenus.create({
+        id: "start-application",
+        title: "Start Application",
+        contexts: ["selection"],
       });
     }
   }

@@ -33,7 +33,7 @@
     Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif !important;
 }
 
-button {
+.content-view button {
   background-color: transparent;
   border: none;
   cursor: pointer;
@@ -179,7 +179,7 @@ button {
   font-weight: 400;
 }
 
-.done-button {
+.content-view .done-button {
   margin-top: 8px;
   padding-block: 2px;
   display: flex;

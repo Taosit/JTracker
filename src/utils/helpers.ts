@@ -43,7 +43,7 @@ export const adaptApplicationFromStorage = (
       ...interview,
       date: new Date(interview.date),
     })),
-  };
+  } as Application;
 };
 
 export const getBlankQuestion = () => ({

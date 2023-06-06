@@ -4,11 +4,16 @@ import { getStorage, setStorage } from "@src/utils/storage";
 
 const Options: React.FC = () => {
   const [draftUrls, setDraftUrls] = useState([""]);
+  const [autoReject, setAutoReject] = useState(false);
 
   useEffect(() => {
-    getStorage(["urls"]).then((storage) => {
-      if (!storage.urls) return;
-      setDraftUrls([...storage.urls, ""]);
+    getStorage(["urls", "autoReject"]).then((storage) => {
+      if (storage.urls) {
+        setDraftUrls(storage.urls);
+      }
+      if (storage.autoReject !== undefined) {
+        setAutoReject(storage.autoReject);
+      }
     });
   }, []);
 
@@ -33,6 +38,12 @@ const Options: React.FC = () => {
     setStorage({ urls: urlsToSave });
   };
 
+  const toggleAutoReject = () => {
+    const newAutoReject = !autoReject;
+    setAutoReject(newAutoReject);
+    setStorage({ autoReject: newAutoReject });
+  };
+
   return (
     <div className="optionsContainer">
       <h2>
@@ -55,6 +66,27 @@ const Options: React.FC = () => {
       </div>
       <div className="buttonContainer">
         <button onClick={saveUrls}>Save</button>
+      </div>
+      <h2>
+        Would you like to set applications whose status has not changed from
+        “applied” to be rejected after 30 days?
+      </h2>
+      <div className="switch-container">
+        <label className="switch">
+          <input
+            type="checkbox"
+            checked={autoReject}
+            onChange={toggleAutoReject}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") {
+                toggleAutoReject();
+              }
+            }}
+            className="checkbox"
+          />
+          <span className="slider"></span>
+          <label>Yes</label>
+        </label>
       </div>
     </div>
   );

@@ -7,6 +7,7 @@ export interface LocalStorage {
     id: number;
     toggleIsOn: boolean;
   };
+  autoReject: boolean;
 }
 
 export const setStorage = (obj: Partial<LocalStorage>) => {
