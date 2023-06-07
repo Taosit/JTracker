@@ -40,6 +40,7 @@
 }
 
 .drag-area {
+  flex-shrink: 0;
   width: 100%;
   height: var(--drag-area-height);
   background-color: var(--primary-dark);

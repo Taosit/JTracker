@@ -87,12 +87,12 @@ type Message =
       data: boolean;
     }
   | {
-      event: "openTab";
-      data: boolean;
-    }
-  | {
       event: "openWindow";
       data: {
         page: number;
       };
+    }
+  | {
+      event: "activateTab";
+      data: null;
     };

@@ -6,7 +6,7 @@ import packageJson from "./package.json";
 const manifest: chrome.runtime.ManifestV3 = {
   manifest_version: 3,
   name: packageJson.name,
-  permissions: ["storage", "contextMenus", "alarms", "activeTab"],
+  permissions: ["storage", "contextMenus", "activeTab", "tabs"],
   version: packageJson.version,
   description: packageJson.description,
   options_page: "src/pages/options/index.html",

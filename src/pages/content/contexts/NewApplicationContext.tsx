@@ -1,8 +1,8 @@
 import {
   adaptApplicationFromStorage,
   getBlankQuestion,
-} from "@src/utils/helpers";
-import { getStorage } from "@src/utils/storage";
+} from "@src/shared/utils/helpers";
+import { getStorage } from "@src/shared/utils/storage";
 import {
   createContext,
   PropsWithChildren,
@@ -10,6 +10,7 @@ import {
   useEffect,
   useState,
 } from "react";
+import { useRegisterMessageListener } from "../hooks/useRegisterMessageListener";
 
 type NewApplicationContextType = {
   newApplication: Application;
@@ -59,6 +60,17 @@ export const NewApplicationContextProvider = ({
       setNewApplication(application);
     });
   }, []);
+
+  useRegisterMessageListener((message: Message) => {
+    if (message.event !== "activateTab") return;
+    getStorage(["applicationInProgress"]).then((storage) => {
+      if (!storage.applicationInProgress) return;
+      const application = adaptApplicationFromStorage(
+        storage.applicationInProgress
+      );
+      setNewApplication(application);
+    });
+  });
 
   const updateNewApplication = (application: Application) => {
     setNewApplication(application);

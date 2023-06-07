@@ -4,7 +4,7 @@ import SortIcon from "./images/sort.svg";
 import RejectIcon from "./images/reject.svg";
 import NextIcon from "./images/arrowRight.svg";
 import { useState } from "react";
-import { toDateString } from "../../../../utils/helpers";
+import { toDateString } from "../../../../shared/utils/helpers";
 import { useApplication } from "../../contexts/ApplicationContext";
 import { IconButton } from "../IconButton/IconButton";
 

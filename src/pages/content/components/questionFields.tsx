@@ -1,6 +1,6 @@
 import { useNewApplication } from "../contexts/NewApplicationContext";
 import { InputGroup } from "./InputGroup";
-import { cleanUpQuestions } from "@src/utils/helpers";
+import { cleanUpQuestions } from "@src/shared/utils/helpers";
 
 export const QuestionFields = () => {
   const { newApplication, updateNewApplication } = useNewApplication();

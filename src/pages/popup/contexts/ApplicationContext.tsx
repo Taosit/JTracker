@@ -6,8 +6,8 @@ import React, {
   useState,
 } from "react";
 import { applicationData } from "../seeds";
-import { getStorage } from "@src/utils/storage";
-import { adaptApplicationFromStorage } from "@src/utils/helpers";
+import { getStorage } from "@src/shared/utils/storage";
+import { adaptApplicationFromStorage } from "@src/shared/utils/helpers";
 
 type ApplicationContextType = {
   applications: Application[];

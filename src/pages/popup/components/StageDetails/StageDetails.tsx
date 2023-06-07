@@ -1,5 +1,5 @@
 import styles from "./StageDetails.module.css";
-import { toDateString } from "../../../../utils/helpers";
+import { toDateString } from "../../../../shared/utils/helpers";
 import CopyIcon from "./images/copy.svg";
 import EditIcon from "./images/edit.svg";
 import CheckmarkIcon from "./images/checkmark.svg";

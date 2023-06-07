@@ -1,7 +1,11 @@
 import { GeneralFields } from "./GeneralFields";
 import { QuestionFields } from "./QuestionFields";
 import { NoteField } from "./NoteField";
-import { startApplication, addQuestion, addAnswer } from "@src/utils/helpers";
+import {
+  startApplication,
+  addQuestion,
+  addAnswer,
+} from "@src/shared/utils/helpers";
 import { useNewApplication } from "../contexts/NewApplicationContext";
 import { useApplicationTransformer } from "../hooks/useApplicationTransformer";
 import { useRegisterMessageListener } from "../hooks/useRegisterMessageListener";
