@@ -87,6 +87,7 @@ export const ApplicationContextProvider = ({ children }: PropsWithChildren) => {
         setApplications(updatedApplication);
       }
     );
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const isInterview = (

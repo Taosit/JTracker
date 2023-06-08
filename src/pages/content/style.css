@@ -33,6 +33,11 @@
     Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif !important;
 }
 
+.content-view *::selection {
+  background: #accef7 !important;
+  color: currentColor !important;
+}
+
 .content-view button {
   background-color: transparent;
   border: none;
@@ -113,6 +118,7 @@
   padding-inline: 4px !important;
   box-shadow: none !important;
   height: 32px !important;
+  caret-color: initial !important;
 }
 
 .input-row input {
@@ -129,6 +135,7 @@
 .input-row input:focus,
 .input-row textarea:focus {
   outline: 2px solid var(--primary-dark) !important;
+  outline-offset: 0;
 }
 
 .input-row button {
@@ -165,6 +172,10 @@
   align-items: center;
   border-radius: 2px;
   padding: 0;
+}
+
+.page-button p {
+  user-select: none;
 }
 
 .page-button:focus {
