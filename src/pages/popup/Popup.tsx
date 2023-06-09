@@ -1,4 +1,3 @@
-// import logo from "@assets/img/logo.svg";
 import "@pages/popup/Popup.css";
 import { ToggleShowWindow } from "./components/ToggleShowWindow/ToggleShowWindow";
 import { Statistics } from "./components/Statistics/Statistics";

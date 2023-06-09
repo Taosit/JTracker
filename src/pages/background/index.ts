@@ -1,5 +1,5 @@
-import { adaptApplicationToStorage } from "@src/utils/helpers";
-import { getStorage, setStorage } from "@src/utils/storage";
+import { adaptApplicationToStorage } from "@src/shared/utils/helpers";
+import { getStorage, setStorage } from "@src/shared/utils/storage";
 import reloadOnUpdate from "virtual:reload-on-update-in-background-script";
 
 reloadOnUpdate("pages/background");
@@ -18,11 +18,16 @@ chrome.runtime.onInstalled.addListener(() => {
     viewingApplicationId: null,
     urls: ["https://www.linkedin.com/", "https://developer.chrome.com/"],
     applicationInProgress: null,
-    currentTab: {
-      id: null,
-      toggleIsOn: false,
-    },
-    autoReject: false,
+    currentTabs: [],
+  });
+
+  chrome.tabs.query({ active: true, currentWindow: true }).then((tabs) => {
+    setStorage({
+      currentTabs: tabs.map((tab) => ({
+        id: tab.id,
+        toggleIsOn: false,
+      })),
+    });
   });
 
   chrome.contextMenus.create({
@@ -32,6 +37,22 @@ chrome.runtime.onInstalled.addListener(() => {
   });
 
   chrome.contextMenus.onClicked.addListener((info, tab) => {
+    console.log(
+      "-background: contentMenu clicked on",
+      tab.id,
+      "sending",
+      info.menuItemId
+    );
+    getStorage(["currentTabs"]).then((storage) => {
+      setStorage({
+        currentTabs: storage.currentTabs.map((currentTab) => {
+          if (currentTab.id === tab.id) {
+            return { ...currentTab, toggleIsOn: true };
+          }
+          return currentTab;
+        }),
+      });
+    });
     if (info.menuItemId === "start-application") {
       chrome.tabs.sendMessage(tab.id, {
         event: "startApplication",
@@ -76,85 +97,121 @@ chrome.runtime.onInstalled.addListener(() => {
   });
 });
 
-chrome.runtime.onMessage.addListener(
-  async (message: Message, sender: chrome.runtime.MessageSender) => {
-    const { event, data } = message;
-    if (event === "updateApplications") {
-      const applications = data.map((application) =>
-        adaptApplicationToStorage(application)
-      );
-      setStorage({ applications });
-      return;
-    }
-    if (event === "setApplicationInProgress") {
-      const applicationInProgress = adaptApplicationToStorage(data);
-      setStorage({ applicationInProgress });
-      chrome.contextMenus.removeAll();
-      if (
-        !applicationInProgress ||
-        (!applicationInProgress.company && !applicationInProgress.link)
-      ) {
-        chrome.contextMenus.create({
-          id: "start-application",
-          title: "Start Application",
-          contexts: ["selection"],
-        });
-      } else {
-        chrome.contextMenus.create({
-          id: "add-question",
-          title: "Add Question",
-          contexts: ["selection"],
-        });
-        const incompleteQuestion =
-          applicationInProgress.application.questions.find(
-            (question) => !question.question || !question.answer
-          );
-        if (incompleteQuestion?.question) {
-          chrome.contextMenus.create({
-            id: "add-answer",
-            title: "Add Answer",
-            contexts: ["selection"],
-          });
-        }
-      }
-      return;
-    }
-    if (event === "setApplicationInView") {
-      setStorage({ viewingApplicationId: data?.id ?? null });
-      return;
-    }
-    if (event === "openTab") {
-      setStorage({ currentTab: { id: sender.tab?.id, toggleIsOn: data } });
-      return;
-    }
-    if (event === "completeApplication") {
-      const { applications, applicationInProgress } = await getStorage([
-        "applications",
-        "applicationInProgress",
-      ]);
-      const filteredApplicationQuestions =
-        applicationInProgress.application.questions.filter(
-          (question) => question.question
-        );
-      setStorage({
-        applications: [
-          ...applications,
-          {
-            ...applicationInProgress,
-            application: {
-              ...applicationInProgress.application,
-              questions: filteredApplicationQuestions,
-            },
-          },
-        ],
-        applicationInProgress: null,
+chrome.tabs.onUpdated.addListener((tabId, changeInfo) => {
+  if (changeInfo.status !== "complete") return;
+  getStorage(["currentTabs"]).then((storage) => {
+    const activeTab = storage.currentTabs.find((tab) => tab.id === tabId);
+    if (!activeTab || !activeTab.toggleIsOn) return;
+    console.log("-background: tab updated and sending toggle", tabId);
+    setTimeout(() => {
+      chrome.tabs.sendMessage(tabId, {
+        event: "toggleWindow",
+        data: true,
       });
-      chrome.contextMenus.removeAll();
+    }, 300);
+  });
+});
+
+chrome.tabs.onActivated.addListener((activeInfo) => {
+  chrome.tabs.sendMessage(activeInfo.tabId, {
+    event: "activateTab",
+    data: null,
+  });
+});
+
+chrome.tabs.onCreated.addListener((tab) => {
+  getStorage(["currentTabs"]).then((storage) => {
+    const tabAlreadyExists = storage.currentTabs.some(
+      (currentTab) => currentTab.id === tab.id
+    );
+    if (tabAlreadyExists) return;
+    setStorage({
+      currentTabs: [...storage.currentTabs, { id: tab.id, toggleIsOn: false }],
+    });
+  });
+});
+
+chrome.tabs.onRemoved.addListener((tabId) => {
+  getStorage(["currentTabs"]).then((storage) => {
+    setStorage({
+      currentTabs: storage.currentTabs.filter((tab) => tab.id !== tabId),
+    });
+  });
+});
+
+chrome.runtime.onMessage.addListener(async (message: Message) => {
+  const { event, data } = message;
+  if (event === "updateApplications") {
+    const applications = data.map((application) =>
+      adaptApplicationToStorage(application)
+    );
+    setStorage({ applications });
+    return;
+  }
+  if (event === "setApplicationInProgress") {
+    const applicationInProgress = adaptApplicationToStorage(data);
+    setStorage({ applicationInProgress });
+    chrome.contextMenus.removeAll();
+    if (
+      !applicationInProgress ||
+      (!applicationInProgress.company && !applicationInProgress.link)
+    ) {
       chrome.contextMenus.create({
         id: "start-application",
         title: "Start Application",
         contexts: ["selection"],
       });
+    } else {
+      chrome.contextMenus.create({
+        id: "add-question",
+        title: "Add Question",
+        contexts: ["selection"],
+      });
+      const incompleteQuestion =
+        applicationInProgress.application.questions.find(
+          (question) => !question.question || !question.answer
+        );
+      if (incompleteQuestion?.question) {
+        chrome.contextMenus.create({
+          id: "add-answer",
+          title: "Add Answer",
+          contexts: ["selection"],
+        });
+      }
     }
+    return;
   }
-);
+  if (event === "setApplicationInView") {
+    setStorage({ viewingApplicationId: data?.id ?? null });
+    return;
+  }
+  if (event === "completeApplication") {
+    const { applications, applicationInProgress } = await getStorage([
+      "applications",
+      "applicationInProgress",
+    ]);
+    const filteredApplicationQuestions =
+      applicationInProgress.application.questions.filter(
+        (question) => question.question
+      );
+    setStorage({
+      applications: [
+        ...applications,
+        {
+          ...applicationInProgress,
+          application: {
+            ...applicationInProgress.application,
+            questions: filteredApplicationQuestions,
+          },
+        },
+      ],
+      applicationInProgress: null,
+    });
+    chrome.contextMenus.removeAll();
+    chrome.contextMenus.create({
+      id: "start-application",
+      title: "Start Application",
+      contexts: ["selection"],
+    });
+  }
+});

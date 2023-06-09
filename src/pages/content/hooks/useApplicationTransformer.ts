@@ -13,7 +13,7 @@ export const useApplicationTransformer = (
       const application = callback(newApplication, message);
       updateNewApplication(application);
     },
-    [newApplication]
+    [callback, event, newApplication, updateNewApplication]
   );
 
   return listner;

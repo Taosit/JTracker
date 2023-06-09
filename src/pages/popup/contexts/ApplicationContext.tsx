@@ -6,8 +6,8 @@ import React, {
   useState,
 } from "react";
 import { applicationData } from "../seeds";
-import { getStorage } from "@src/utils/storage";
-import { adaptApplicationFromStorage } from "@src/utils/helpers";
+import { getStorage } from "@src/shared/utils/storage";
+import { adaptApplicationFromStorage } from "@src/shared/utils/helpers";
 
 type ApplicationContextType = {
   applications: Application[];
@@ -87,6 +87,7 @@ export const ApplicationContextProvider = ({ children }: PropsWithChildren) => {
         setApplications(updatedApplication);
       }
     );
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const isInterview = (

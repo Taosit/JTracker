@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import "@pages/options/Options.css";
-import { getStorage, setStorage } from "@src/utils/storage";
+import { getStorage, setStorage } from "@src/shared/utils/storage";
 
 const Options: React.FC = () => {
   const [draftUrls, setDraftUrls] = useState([""]);

@@ -1,7 +1,7 @@
 import styles from "./ApplicationDetails.module.css";
 import { StageDetails } from "../StageDetails/StageDetails";
 import { useApplication } from "../../contexts/ApplicationContext";
-import { setStorage } from "@src/utils/storage";
+import { setStorage } from "@src/shared/utils/storage";
 
 export const ApplicationDetails = () => {
   const { applications, viewingApplicationId, setviewingApplicationId } =

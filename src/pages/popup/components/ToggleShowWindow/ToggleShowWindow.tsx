@@ -11,6 +11,7 @@ export const ToggleShowWindow = () => {
         <input
           type="checkbox"
           checked={shouldShowWindow}
+          disabled={shouldShowWindow === null}
           onChange={toggleWindow}
           onKeyDown={(e) => {
             if (e.key === "Enter") {

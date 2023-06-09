@@ -3,10 +3,10 @@ export interface LocalStorage {
   viewingApplicationId: string | null;
   urls: string[];
   applicationInProgress: ApplicationWithPrimativeDate;
-  currentTab: {
+  currentTabs: {
     id: number;
     toggleIsOn: boolean;
-  };
+  }[];
   autoReject: boolean;
 }
 
@@ -26,5 +26,3 @@ export function getStorage<K extends keyof LocalStorage>(keys: K[]) {
     });
   });
 }
-
-// const id = (await getStorage(["viewingApplicationId"])).viewingApplicationId;
