@@ -64,5 +64,5 @@ type Message =
     }
   | {
       event: "activateTab";
-      data: null;
+      data: number;
     };

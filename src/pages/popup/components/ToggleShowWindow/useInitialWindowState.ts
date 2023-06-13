@@ -9,19 +9,14 @@ export const useInitialWindowState = () => {
   useEffect(() => {
     chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
       const activeTabId = tabs[0].id;
-      chrome.tabs.get(activeTabId, (tab) => {
-        getStorage(["urls", "currentTabs"]).then((storage) => {
-          const isAlwaysOpen = storage.urls.some((url) =>
-            tab.url?.includes(url)
-          );
-          const activeTab = storage.currentTabs.find(
-            (tab) => tab.id === activeTabId
-          );
-          console.log("currentTabs", storage.currentTabs);
-          console.log("activeTab", activeTab);
-          const hasBeenToggle = activeTab?.toggleIsOn;
-          setShouldShowWindow(isAlwaysOpen || hasBeenToggle);
-        });
+      getStorage(["urls", "currentTabs"]).then((storage) => {
+        const activeTab = storage.currentTabs.find(
+          (tab) => tab.id === activeTabId
+        );
+        console.log("currentTabs", storage.currentTabs);
+        console.log("activeTab", activeTab);
+        const toggleIsOn = activeTab?.toggleIsOn;
+        setShouldShowWindow(toggleIsOn);
       });
     });
   }, []);

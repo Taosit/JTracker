@@ -1,8 +1,17 @@
+import { useEffect, useRef } from "react";
 import styles from "./ToggleShowWindow.module.css";
 import { useToggle } from "./useToggle";
 
 export const ToggleShowWindow = () => {
   const { shouldShowWindow, toggleWindow } = useToggle();
+  const sliderRef = useRef<HTMLSpanElement>(null);
+
+  useEffect(() => {
+    if (!sliderRef?.current) return;
+    setTimeout(() => {
+      sliderRef.current.classList.add(styles.withTransition);
+    }, 400);
+  }, []);
 
   return (
     <div className={styles.container}>
@@ -20,7 +29,7 @@ export const ToggleShowWindow = () => {
           }}
           className={styles.checkbox}
         />
-        <span className={styles.slider}></span>
+        <span className={styles.slider} ref={sliderRef}></span>
       </label>
     </div>
   );

@@ -114,7 +114,7 @@ chrome.tabs.onUpdated.addListener((tabId, changeInfo) => {
 chrome.tabs.onActivated.addListener((activeInfo) => {
   chrome.tabs.sendMessage(activeInfo.tabId, {
     event: "activateTab",
-    data: null,
+    data: activeInfo.tabId,
   });
 });
 

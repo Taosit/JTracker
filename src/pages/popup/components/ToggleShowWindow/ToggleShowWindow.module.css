@@ -44,8 +44,6 @@
   width: var(--toggle-width);
   bottom: 0;
   background-color: #ccc;
-  -webkit-transition: 0.4s;
-  transition: 0.4s;
   border-radius: 34px;
 }
 
@@ -57,9 +55,17 @@
   left: var(--stroke-width);
   bottom: var(--stroke-width);
   background-color: white;
+  border-radius: 50%;
+}
+
+.slider.withTransition {
   -webkit-transition: 0.4s;
   transition: 0.4s;
-  border-radius: 50%;
+}
+
+.slider.slider.withTransition:before {
+  -webkit-transition: 0.4s;
+  transition: 0.4s;
 }
 
 .checkbox:checked + .slider {
