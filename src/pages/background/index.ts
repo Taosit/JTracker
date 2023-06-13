@@ -1,4 +1,3 @@
-import { adaptApplicationToStorage } from "@src/shared/utils/helpers";
 import { getStorage, setStorage } from "@src/shared/utils/storage";
 import reloadOnUpdate from "virtual:reload-on-update-in-background-script";
 
@@ -16,7 +15,7 @@ chrome.runtime.onInstalled.addListener(() => {
   setStorage({
     applications: [],
     viewingApplicationId: null,
-    urls: ["https://www.linkedin.com/", "https://developer.chrome.com/"],
+    urls: [{ id: 1, url: "https://www.linkedin.com/" }],
     applicationInProgress: null,
     currentTabs: [],
   });
@@ -141,16 +140,8 @@ chrome.tabs.onRemoved.addListener((tabId) => {
 
 chrome.runtime.onMessage.addListener(async (message: Message) => {
   const { event, data } = message;
-  if (event === "updateApplications") {
-    const applications = data.map((application) =>
-      adaptApplicationToStorage(application)
-    );
-    setStorage({ applications });
-    return;
-  }
   if (event === "setApplicationInProgress") {
-    const applicationInProgress = adaptApplicationToStorage(data);
-    setStorage({ applicationInProgress });
+    const applicationInProgress = data;
     chrome.contextMenus.removeAll();
     if (
       !applicationInProgress ||
@@ -181,32 +172,7 @@ chrome.runtime.onMessage.addListener(async (message: Message) => {
     }
     return;
   }
-  if (event === "setApplicationInView") {
-    setStorage({ viewingApplicationId: data?.id ?? null });
-    return;
-  }
   if (event === "completeApplication") {
-    const { applications, applicationInProgress } = await getStorage([
-      "applications",
-      "applicationInProgress",
-    ]);
-    const filteredApplicationQuestions =
-      applicationInProgress.application.questions.filter(
-        (question) => question.question
-      );
-    setStorage({
-      applications: [
-        ...applications,
-        {
-          ...applicationInProgress,
-          application: {
-            ...applicationInProgress.application,
-            questions: filteredApplicationQuestions,
-          },
-        },
-      ],
-      applicationInProgress: null,
-    });
     chrome.contextMenus.removeAll();
     chrome.contextMenus.create({
       id: "start-application",

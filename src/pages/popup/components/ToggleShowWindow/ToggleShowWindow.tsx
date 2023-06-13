@@ -1,5 +1,5 @@
 import styles from "./ToggleShowWindow.module.css";
-import { useToggle } from "../../hooks/useToggle";
+import { useToggle } from "./useToggle";
 
 export const ToggleShowWindow = () => {
   const { shouldShowWindow, toggleWindow } = useToggle();

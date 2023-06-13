@@ -7,37 +7,15 @@ type Application = {
   interviews: Interview[];
 };
 
-type ApplicationWithPrimativeDate = {
-  id: string;
-  company: string;
-  link: string;
-  stage: Stage;
-  application: ApplicationStageWithPrimativeDate;
-  interviews: InterviewWithPrimativeDate[];
-};
-
 type Stage = "ap" | "r1" | "r2" | "r3" | "of" | "xx";
 
 type ApplicationStage = {
-  date: Date;
-  questions: Question[];
-  notes: string;
-};
-
-type ApplicationStageWithPrimativeDate = {
   date: number;
   questions: Question[];
   notes: string;
 };
 
 type Interview = {
-  round: number;
-  date?: Date;
-  questions: Question[];
-  notes?: string;
-};
-
-type InterviewWithPrimativeDate = {
   round: number;
   date?: number;
   questions: Question[];
@@ -51,14 +29,6 @@ type Question = {
 };
 
 type Message =
-  | {
-      event: "updateApplications";
-      data: Application[];
-    }
-  | {
-      event: "setApplicationInView";
-      data: Application | null;
-    }
   | {
       event: "startApplication";
       data: {
@@ -80,7 +50,7 @@ type Message =
     }
   | {
       event: "completeApplication";
-      data: null;
+      data: Application;
     }
   | {
       event: "toggleWindow";

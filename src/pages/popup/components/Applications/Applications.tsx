@@ -1,25 +1,13 @@
 import styles from "./Applications.module.css";
 import SearchIcon from "./images/search.svg";
 import SortIcon from "./images/sort.svg";
-import RejectIcon from "./images/reject.svg";
-import NextIcon from "./images/arrowRight.svg";
 import { useState } from "react";
-import { toDateString } from "../../../../shared/utils/helpers";
-import { useApplication } from "../../contexts/ApplicationContext";
-import { IconButton } from "../IconButton/IconButton";
-
-type UpdateApplication = (
-  application: Application
-) => undefined | Application[];
+import { NoApplicationBox } from "./NoApplicationBox/NoApplicationBox";
+import { ApplicationRow } from "./ApplicationRow/ApplicationRow";
+import { useApplicationStore } from "../../stores/applicationStore";
 
 export const Applications = () => {
-  const {
-    applications,
-    rejectApplication,
-    advanceApplication,
-    acceptApplication,
-    setviewingApplicationId,
-  } = useApplication();
+  const applications = useApplicationStore((state) => state.applications);
 
   const [searchString, setSearchString] = useState("");
   const [sortValue, setSortValue] = useState("date");
@@ -41,31 +29,14 @@ export const Applications = () => {
     })
     .sort((a, b) => {
       if (sortValue === "date") {
-        return b.application.date.getTime() - a.application.date.getTime();
+        return b.application.date - a.application.date;
       }
       return stageOrder.indexOf(b.stage) - stageOrder.indexOf(a.stage);
     });
 
-  const updateAndSaveApplications = async (
-    application: Application,
-    updateApplication: UpdateApplication
-  ) => {
-    const updatedApplications = updateApplication(application);
-    if (updatedApplications) {
-      chrome.runtime.sendMessage({
-        event: "updateApplications",
-        data: updatedApplications,
-      });
-    }
-  };
-
-  const setAndSaveviewingApplicationId = async (application: Application) => {
-    setviewingApplicationId(application.id);
-    chrome.runtime.sendMessage({
-      event: "setApplicationInView",
-      data: application,
-    });
-  };
+  if (applications.length === 0) {
+    return <NoApplicationBox />;
+  }
 
   return (
     <>
@@ -103,67 +74,7 @@ export const Applications = () => {
           <th>App. Date</th>
         </tr>
         {filteredAndSortedApplications.map((application) => (
-          <tr key={application.id} className={styles.tableRow}>
-            <td className={styles.companyCell}>
-              <div className={styles.companyData}>
-                <div className={styles.companyName}>
-                  <p>{application.company}</p>
-                </div>
-                <div className={styles.companyLink}>
-                  <a href={application.link} target="_blank" rel="noreferrer">
-                    {application.link.replace("https://", "")}
-                  </a>
-                </div>
-                <button
-                  onClick={() => setAndSaveviewingApplicationId(application)}
-                >
-                  App. Details
-                </button>
-              </div>
-            </td>
-            <td className={styles.statusCell}>
-              <div className={styles.statusData}>
-                <div className={styles.statusControls}>
-                  <IconButton
-                    className={styles.iconButton}
-                    imageUrl={RejectIcon}
-                    altText="Application Rejected"
-                    onClick={() =>
-                      updateAndSaveApplications(application, rejectApplication)
-                    }
-                    disabled={application.stage === "xx"}
-                  />
-                  <p>{application.stage.toUpperCase()}</p>
-                  <IconButton
-                    className={styles.iconButton}
-                    imageUrl={NextIcon}
-                    altText="Application Advanced"
-                    onClick={() =>
-                      updateAndSaveApplications(application, advanceApplication)
-                    }
-                    disabled={
-                      application.stage === "xx" ||
-                      application.stage === "of" ||
-                      application.stage === "r3"
-                    }
-                  />
-                </div>
-                <button
-                  onClick={() =>
-                    updateAndSaveApplications(application, acceptApplication)
-                  }
-                  disabled={
-                    application.stage === "of" || application.stage === "xx"
-                  }
-                >
-                  Offer
-                </button>
-              </div>
-            </td>
-            <td className={styles.dateCell}>
-              {toDateString(application.application.date)}
-            </td>
-          </tr>
+          <ApplicationRow key={application.id} application={application} />
         ))}
       </table>
     </>

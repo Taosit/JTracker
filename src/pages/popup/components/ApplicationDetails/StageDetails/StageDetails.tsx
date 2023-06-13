@@ -1,32 +1,33 @@
 import styles from "./StageDetails.module.css";
-import { toDateString } from "../../../../shared/utils/helpers";
+import { isInterview, toDateString } from "../../../../../shared/utils/helpers";
 import CopyIcon from "./images/copy.svg";
 import EditIcon from "./images/edit.svg";
 import CheckmarkIcon from "./images/checkmark.svg";
 import ChevronUpIcon from "./images/chevronUp.svg";
 import ChevronDownIcon from "./images/chevronDown.svg";
-import { useState } from "react";
-import { useApplication } from "../../contexts/ApplicationContext";
-import { IconButton } from "../IconButton/IconButton";
+import { IconButton } from "../../IconButton/IconButton";
+import { useStageDetails } from "./useStage";
+import { useEditQuestion } from "./useEditQuestion";
+import { useNote } from "./useNote";
 
 type Props = {
   stage: ApplicationStage | Interview;
 };
 
 export const StageDetails = ({ stage }: Props) => {
-  const { viewingApplicationId, updateStageDetails } = useApplication();
+  const { draftStage, isOpen, setIsOpen, updateAndSaveStage } =
+    useStageDetails(stage);
 
-  const [editingQuestion, setEditingQuestion] = useState<Question | null>(null);
-  const [draftStage, setDraftStage] = useState(stage);
-  const [isOpen, setIsOpen] = useState(true);
+  const {
+    editingQuestion,
+    startEdit,
+    editQuestionText,
+    editAnswerText,
+    addQuestion,
+    saveQuestion,
+  } = useEditQuestion();
 
-  const [isEditingNote, setIsEditingNote] = useState(false);
-
-  const isInterview = (
-    stage: ApplicationStage | Interview
-  ): stage is Interview => {
-    return (stage as Interview).round !== undefined;
-  };
+  const { isEditingNote, setIsEditingNote, onNoteChange, saveNote } = useNote();
 
   const getDate = (stage: ApplicationStage | Interview) => {
     if (!stage.date) return "";
@@ -40,97 +41,13 @@ export const StageDetails = ({ stage }: Props) => {
   const saveInterviewDate = (e: React.ChangeEvent<HTMLInputElement>) => {
     const updatedStage = {
       ...draftStage,
-      date: new Date(`${e.target.value}T00:00:00`),
+      date: new Date(`${e.target.value}T00:00:00`).getTime(),
     };
-    const updatedApplications = updateStageDetails(
-      viewingApplicationId,
-      updatedStage
-    );
-    chrome.runtime.sendMessage({
-      event: "updateApplications",
-      data: updatedApplications,
-    });
-    setDraftStage(updatedStage);
+    updateAndSaveStage(updatedStage);
   };
 
-  const copyText = (answer: string) => {
-    navigator.clipboard.writeText(answer);
-  };
-
-  const editQuestionText = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setEditingQuestion((prev) => ({
-      ...prev,
-      question: e.target.value,
-    }));
-  };
-
-  const editAnswerText = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    setEditingQuestion((prev) => ({
-      ...prev,
-      answer: e.target.value,
-    }));
-  };
-
-  const startEdit = (question: Question) => {
-    setEditingQuestion(question);
-  };
-
-  const saveQuestion = () => {
-    if (!editingQuestion.question) return;
-    const updatedStage = {
-      ...draftStage,
-      questions: draftStage.questions.map((question) => {
-        if (question.id === editingQuestion.id) {
-          return editingQuestion;
-        }
-        return question;
-      }),
-    };
-    const updatedApplications = updateStageDetails(
-      viewingApplicationId,
-      updatedStage
-    );
-    chrome.runtime.sendMessage({
-      event: "updateApplications",
-      data: updatedApplications,
-    });
-    setDraftStage(updatedStage);
-    setEditingQuestion(null);
-  };
-
-  const addQuestion = () => {
-    const id = crypto.getRandomValues(new Uint32Array(1))[0].toString();
-    const question = {
-      id,
-      question: "",
-      answer: "",
-    };
-    const updatedStage = {
-      ...stage,
-      questions: [...stage.questions, question],
-    };
-    setDraftStage(updatedStage);
-    setEditingQuestion(question);
-  };
-
-  const onNoteChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    const updatedStage = {
-      ...draftStage,
-      notes: e.target.value,
-    };
-    setDraftStage(updatedStage);
-  };
-
-  const saveNote = () => {
-    const updatedApplications = updateStageDetails(
-      viewingApplicationId,
-      draftStage
-    );
-    chrome.runtime.sendMessage({
-      event: "updateApplications",
-      data: updatedApplications,
-    });
-    setIsEditingNote(false);
+  const copyText = (text: string) => {
+    navigator.clipboard.writeText(text);
   };
 
   return (
@@ -169,7 +86,7 @@ export const StageDetails = ({ stage }: Props) => {
         <img src={isOpen ? ChevronUpIcon : ChevronDownIcon} alt="chevron" />
       </summary>
       <div className={styles.body}>
-        {draftStage.questions.length === 0 ? (
+        {!draftStage || draftStage.questions.length === 0 ? (
           <p className={styles.noItem}>No quesion</p>
         ) : (
           <ol className={styles.questions}>
@@ -235,7 +152,7 @@ export const StageDetails = ({ stage }: Props) => {
             />
           ) : (
             <>
-              {draftStage.notes ? (
+              {draftStage?.notes ? (
                 <p>Note: {draftStage.notes}</p>
               ) : (
                 <p className={styles.noItem}>No Note</p>

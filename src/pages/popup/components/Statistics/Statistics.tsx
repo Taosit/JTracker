@@ -4,10 +4,10 @@ import CryIcon from "./images/cry.svg";
 import SpeakIcon from "./images/speak.svg";
 import HappyIcon from "./images/happy.svg";
 import React, { useCallback } from "react";
-import { useApplication } from "../../contexts/ApplicationContext";
+import { useApplicationStore } from "../../stores/applicationStore";
 
 const StatisticsRaw = () => {
-  const { applications } = useApplication();
+  const applications = useApplicationStore((state) => state.applications);
 
   const getNumOfApplicationsByStage = useCallback(
     (stage: Stage) => {

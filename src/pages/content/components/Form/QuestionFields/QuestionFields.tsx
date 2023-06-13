@@ -1,9 +1,15 @@
-import { useNewApplication } from "../contexts/NewApplicationContext";
-import { InputGroup } from "./InputGroup";
+import { useNewApplicationStore } from "../../../stores/NewApplicationStore";
+import { InputGroup } from "../InputGroup/InputGroup";
 import { cleanUpQuestions } from "@src/shared/utils/helpers";
+import { QuestionAnswerPair, QuestionsContainer } from "./QuestionFieldsStyles";
 
 export const QuestionFields = () => {
-  const { newApplication, updateNewApplication } = useNewApplication();
+  const newApplication = useNewApplicationStore(
+    (state) => state.newApplication
+  );
+  const updateNewApplication = useNewApplicationStore(
+    (state) => state.updateNewApplication
+  );
   const onQuestionChange = (question: string, id: string) => {
     const rawQuestions = newApplication.application.questions.map((q) =>
       q.id === id ? { ...q, question } : q
@@ -27,9 +33,9 @@ export const QuestionFields = () => {
   };
 
   return (
-    <div className="questions">
+    <QuestionsContainer>
       {newApplication.application.questions.map((question, index) => (
-        <div key={question.id} className="question-answer-pair">
+        <QuestionAnswerPair key={question.id}>
           <InputGroup
             label={`${index + 1}. Question`}
             value={question.question}
@@ -41,8 +47,8 @@ export const QuestionFields = () => {
             onChange={(str: string) => onAnswerChange(str, question.id)}
             multiline
           />
-        </div>
+        </QuestionAnswerPair>
       ))}
-    </div>
+    </QuestionsContainer>
   );
 };

@@ -1,7 +1,7 @@
-import { useInitialWindowState } from "@src/shared/hooks/useInitialWindowState";
-import { useTabId } from "@src/shared/hooks/useTabId";
 import { getStorage, setStorage } from "@src/shared/utils/storage";
 import { useEffect, useState } from "react";
+import { useInitialWindowState } from "./useInitialWindowState";
+import { useTabId } from "./useTabId";
 
 export const useToggle = () => {
   const [shouldShowWindow, setShouldShowWindow] = useState<boolean | null>(

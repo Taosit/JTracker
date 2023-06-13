@@ -1,8 +1,11 @@
 export interface LocalStorage {
-  applications: ApplicationWithPrimativeDate[];
+  applications: Application[];
   viewingApplicationId: string | null;
-  urls: string[];
-  applicationInProgress: ApplicationWithPrimativeDate;
+  urls: {
+    id: number;
+    url: string;
+  }[];
+  applicationInProgress: Application;
   currentTabs: {
     id: number;
     toggleIsOn: boolean;

@@ -1,19 +1,27 @@
-import { GeneralFields } from "./GeneralFields";
-import { QuestionFields } from "./QuestionFields";
-import { NoteField } from "./NoteField";
+import { GeneralFields } from "./GeneralFields/GeneralFields";
+import { QuestionFields } from "./QuestionFields/QuestionFields";
+import { NoteField } from "./NoteField/NoteField";
 import {
   startApplication,
   addQuestion,
   addAnswer,
 } from "@src/shared/utils/helpers";
-import { useNewApplication } from "../contexts/NewApplicationContext";
-import { useApplicationTransformer } from "../hooks/useApplicationTransformer";
-import { useRegisterMessageListener } from "../hooks/useRegisterMessageListener";
-import { usePage } from "../contexts/PageContext";
+import { useApplicationTransformer } from "./useApplicationTransformer";
+import { useRegisterMessageListener } from "../../hooks/useRegisterMessageListener";
+import { useNewApplicationStore } from "../../stores/NewApplicationStore";
+import { usePageStore } from "../../stores/PageStore";
+import {
+  FormContainer,
+  FormContent,
+  FormHeader,
+  FormTitle,
+} from "./FormStyles";
 
 export const Form = () => {
-  const { newApplication } = useNewApplication();
-  const { page } = usePage();
+  const newApplication = useNewApplicationStore(
+    (state) => state.newApplication
+  );
+  const page = usePageStore((state) => state.page);
 
   const startApplicationListener = useApplicationTransformer(
     "startApplication",
@@ -36,15 +44,15 @@ export const Form = () => {
   };
 
   return (
-    <div className="form-container" draggable="false">
-      <div className="form-header">
-        <h1 className="title">{getTitle()}</h1>
-      </div>
-      <form>
+    <FormContainer>
+      <FormHeader>
+        <FormTitle>{getTitle()}</FormTitle>
+      </FormHeader>
+      <FormContent>
         {page === 0 && <GeneralFields />}
         {page === 1 && <QuestionFields />}
         {page === 2 && <NoteField />}
-      </form>
-    </div>
+      </FormContent>
+    </FormContainer>
   );
 };

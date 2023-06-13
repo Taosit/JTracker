@@ -1,11 +1,11 @@
 import { getStorage } from "@src/shared/utils/storage";
 import { useEffect, useState } from "react";
 import { useRegisterMessageListener } from "./useRegisterMessageListener";
-import { usePage } from "../contexts/PageContext";
+import { usePageStore } from "../stores/PageStore";
 
 export const useShouldShowWindow = () => {
   const [shouldShowWindow, setShouldShowWindow] = useState(false);
-  const { setPage } = usePage();
+  const setPage = usePageStore((state) => state.setPage);
 
   useRegisterMessageListener((message: Message) => {
     if (message.event === "toggleWindow") {

@@ -1,11 +1,17 @@
 import styles from "./ApplicationDetails.module.css";
-import { StageDetails } from "../StageDetails/StageDetails";
-import { useApplication } from "../../contexts/ApplicationContext";
+import { StageDetails } from "./StageDetails/StageDetails";
 import { setStorage } from "@src/shared/utils/storage";
+import { useApplicationStore } from "../../stores/applicationStore";
+import { StageContextProvider } from "./StageDetails/useStage";
 
 export const ApplicationDetails = () => {
-  const { applications, viewingApplicationId, setviewingApplicationId } =
-    useApplication();
+  const applications = useApplicationStore((state) => state.applications);
+  const viewingApplicationId = useApplicationStore(
+    (state) => state.viewingApplicationId
+  );
+  const setviewingApplicationId = useApplicationStore(
+    (state) => state.setviewingApplicationId
+  );
 
   const viewingApplication = applications.find(
     (application) => application.id === viewingApplicationId
@@ -32,12 +38,14 @@ export const ApplicationDetails = () => {
           {viewingApplication.link}
         </a>
       </div>
-      <div className={styles.stages}>
-        <StageDetails key="ap" stage={viewingApplication.application} />
-        {viewingApplication.interviews.map((interview) => (
-          <StageDetails key={interview.round} stage={interview} />
-        ))}
-      </div>
+      <StageContextProvider>
+        <div className={styles.stages}>
+          <StageDetails key="ap" stage={viewingApplication.application} />
+          {viewingApplication.interviews.map((interview) => (
+            <StageDetails key={interview.round} stage={interview} />
+          ))}
+        </div>
+      </StageContextProvider>
     </>
   );
 };
