@@ -23,6 +23,7 @@ export const FormTitle = styled.h1`
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  text-align: left;
 `;
 
 export const FormContent = styled.div`

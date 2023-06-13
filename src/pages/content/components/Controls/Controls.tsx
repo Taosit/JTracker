@@ -4,6 +4,7 @@ import {
   ButtonText,
   ControlsContainer,
   DoneButton,
+  Icon,
   PageButton,
   PageControls,
 } from "./ControlsStyles";
@@ -39,7 +40,7 @@ export const Controls = () => {
           disabled={page === 0}
           style={{ visibility: page === 0 ? "hidden" : "visible" }}
         >
-          <img
+          <Icon
             src="https://res.cloudinary.com/del89ro4h/image/upload/v1685747699/chevron-left_zkr9ab.svg"
             alt="chevron left"
           />
@@ -55,14 +56,14 @@ export const Controls = () => {
           {page !== pageOrder.length - 1 && (
             <ButtonText>{pageOrder[page + 1]}</ButtonText>
           )}
-          <img
+          <Icon
             src="https://res.cloudinary.com/del89ro4h/image/upload/v1685747699/chevron-right_h8brpf.svg"
             alt="chevron right"
           />
         </PageButton>
       </PageControls>
       <DoneButton onClick={completeApplication} disabled={isDisabled}>
-        <img
+        <Icon
           src="https://res.cloudinary.com/del89ro4h/image/upload/v1685747681/done_nk2nku.svg"
           alt="done"
         />

@@ -26,9 +26,10 @@ export const Input = styled.input`
   border-radius: 2px !important;
   border: none !important;
   font-size: 16px !important;
-  padding-inline: 4px !important;
+  color: var(--text-dark) !important;
+  padding: 0 4px !important;
   box-shadow: none !important;
-  height: 32px;
+  height: 32px !important;
   caret-color: initial;
   &:active,
   &:focus {
@@ -48,10 +49,11 @@ export const Textarea = styled.textarea`
   border-radius: 2px !important;
   border: none !important;
   font-size: 16px !important;
+  color: var(--text-dark) !important;
   padding-inline: 4px !important;
   box-shadow: none !important;
   caret-color: initial;
-  height: 96px;
+  height: 96px !important;
   resize: none;
   line-height: 1.3;
   padding: 4px;

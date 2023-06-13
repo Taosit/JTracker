@@ -22,10 +22,14 @@ export const PageButton = styled.button`
   background-color: transparent;
 
   &:focus {
-    outline: none;
+    outline: none !important;
   }
   &:focus-visible {
-    outline: 2px solid var(--primary-dark);
+    outline: 2px solid var(--primary-dark) !important;
+  }
+
+  &:hover {
+    background-color: transparent;
   }
 `;
 
@@ -33,6 +37,7 @@ export const ButtonText = styled.p`
   text-transform: capitalize;
   font-weight: 400;
   font-size: 16px;
+  color: var(--text-dark);
   margin: 0;
   padding: 0;
 `;
@@ -58,10 +63,20 @@ export const DoneButton = styled.button`
   }
 
   &:focus {
-    outline: none;
+    outline: none !important;
   }
 
   &:focus-visible {
-    outline: 2px solid white;
+    outline: 2px solid white !important;
   }
+
+  &:hover {
+    background-color: var(--primary-dark);
+  }
+`;
+
+export const Icon = styled.img`
+  width: 24px;
+  height: 24px;
+  margin: 0;
 `;
