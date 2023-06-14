@@ -7,7 +7,6 @@ import { createNewApplication } from "@src/shared/utils/helpers";
 
 type State = {
   newApplication: Application;
-  applications: Application[];
 };
 
 type Actions = {
@@ -21,7 +20,6 @@ const chromeStorage = {
     const result = {
       state: {
         newApplication: storage.applicationInProgress || createNewApplication(),
-        applications: storage.applications,
       },
       version: 0,
     };
@@ -29,9 +27,9 @@ const chromeStorage = {
   },
   setItem: (_: string, value: string) => {
     const {
-      state: { newApplication, applications },
+      state: { newApplication },
     } = JSON.parse(value);
-    setStorage({ applicationInProgress: newApplication, applications });
+    setStorage({ applicationInProgress: newApplication });
   },
   removeItem: () => undefined,
 };
@@ -40,7 +38,6 @@ export const useNewApplicationStore = create(
   persist(
     immer<State & Actions>((set) => ({
       newApplication: null,
-      applications: [],
       updateNewApplication: (application) => {
         set((state) => {
           state.newApplication = application;
@@ -52,11 +49,6 @@ export const useNewApplicationStore = create(
       },
       completeApplication: () => {
         set((state) => {
-          state.newApplication.application.questions =
-            state.newApplication.application.questions.filter(
-              (question) => question.question
-            );
-          state.applications.push(state.newApplication);
           state.newApplication = createNewApplication();
         });
       },

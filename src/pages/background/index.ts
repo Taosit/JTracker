@@ -1,5 +1,6 @@
 import { getStorage, setStorage } from "@src/shared/utils/storage";
 import reloadOnUpdate from "virtual:reload-on-update-in-background-script";
+import { produce } from "immer";
 
 reloadOnUpdate("pages/background");
 
@@ -38,12 +39,6 @@ chrome.runtime.onInstalled.addListener(() => {
 });
 
 chrome.contextMenus.onClicked.addListener((info, tab) => {
-  console.log(
-    "-background: contentMenu clicked on",
-    tab.id,
-    "sending",
-    info.menuItemId
-  );
   getStorage(["currentTabs"]).then((storage) => {
     setStorage({
       currentTabs: storage.currentTabs.map((currentTab) => {
@@ -110,7 +105,6 @@ chrome.tabs.onUpdated.addListener((tabId, changeInfo) => {
     const tabAlreadyExists = storage.currentTabs.some(
       (currentTab) => currentTab.id === tabId
     );
-    console.log("storing tab");
     if (tabAlreadyExists) return;
     setStorage({
       currentTabs: [
@@ -189,6 +183,21 @@ chrome.runtime.onMessage.addListener(async (message: Message) => {
     return;
   }
   if (event === "completeApplication") {
+    const newApplication = data;
+    getStorage(["applications"]).then(({ applications }) => {
+      const filteredQuestions = newApplication.application.questions.filter(
+        (question) => question.question
+      );
+      const newApplicationWithFilteredQuestions = produce(
+        newApplication,
+        (draft) => {
+          draft.application.questions = filteredQuestions;
+        }
+      );
+      setStorage({
+        applications: [...applications, newApplicationWithFilteredQuestions],
+      });
+    });
     chrome.contextMenus.removeAll();
     chrome.contextMenus.create({
       id: "start-application",
