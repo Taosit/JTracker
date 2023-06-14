@@ -45,6 +45,7 @@ export const StageDetails = ({ stage }: Props) => {
     };
     updateAndSaveStage(updatedStage);
   };
+  console.log("draftStage", draftStage);
 
   const copyText = (text: string) => {
     navigator.clipboard.writeText(text);

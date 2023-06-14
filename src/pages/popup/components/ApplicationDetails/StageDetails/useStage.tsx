@@ -18,7 +18,9 @@ export const useStageDetails = (stage?: ApplicationStage | Interview) => {
   if (!currentStageContext) {
     throw new Error("useStage has to be used within <StageContextProvider>");
   }
-  stage && currentStageContext.setDraftStage(stage);
+  if (stage && !currentStageContext.draftStage) {
+    currentStageContext.setDraftStage(stage);
+  }
   return currentStageContext;
 };
 

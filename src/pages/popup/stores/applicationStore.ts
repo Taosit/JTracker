@@ -39,15 +39,19 @@ const chromeStorage = {
       },
       version: 0,
     };
+    console.log("getting item", result);
     return JSON.stringify(result);
   },
-  setItem: (_: string, value: string) => {
+  setItem: async (_: string, value: string) => {
+    console.log("setting item", JSON.parse(value));
     const {
       state: { applications, viewingApplicationId },
     } = JSON.parse(value);
-    setStorage({ applications, viewingApplicationId });
+    await setStorage({ applications, viewingApplicationId });
   },
-  removeItem: () => undefined,
+  removeItem: () => {
+    console.log("removing item, SHOULD NOT HAPPEN");
+  },
 };
 
 export const useApplicationStore = create(

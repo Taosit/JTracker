@@ -38,14 +38,17 @@ export const ApplicationDetails = () => {
           {viewingApplication.link}
         </a>
       </div>
-      <StageContextProvider>
-        <div className={styles.stages}>
+
+      <div className={styles.stages}>
+        <StageContextProvider>
           <StageDetails key="ap" stage={viewingApplication.application} />
-          {viewingApplication.interviews.map((interview) => (
-            <StageDetails key={interview.round} stage={interview} />
-          ))}
-        </div>
-      </StageContextProvider>
+        </StageContextProvider>
+        {viewingApplication.interviews.map((interview) => (
+          <StageContextProvider key={interview.round}>
+            <StageDetails stage={interview} />
+          </StageContextProvider>
+        ))}
+      </div>
     </>
   );
 };

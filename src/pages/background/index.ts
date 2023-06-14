@@ -106,6 +106,19 @@ chrome.tabs.onUpdated.addListener((tabId, changeInfo) => {
       data: tabId,
     });
   }, 300);
+  getStorage(["currentTabs"]).then((storage) => {
+    const tabAlreadyExists = storage.currentTabs.some(
+      (currentTab) => currentTab.id === tabId
+    );
+    console.log("storing tab");
+    if (tabAlreadyExists) return;
+    setStorage({
+      currentTabs: [
+        ...storage.currentTabs,
+        { id: tabId, toggleIsEnabled: false, toggleIsOn: false },
+      ],
+    });
+  });
 });
 
 // Send message to sync applicationInProgress
