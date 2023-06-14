@@ -19,12 +19,18 @@ export default function App() {
   const shouldShowWindow = useShouldShowWindow(tabId);
 
   useRegisterMessageListener((message: Message) => {
-    if (message.event !== "activateTab") return;
-    setTabId(message.data);
-    getStorage(["applicationInProgress"]).then((storage) => {
-      if (!storage.applicationInProgress) return;
-      updateNewApplication(storage.applicationInProgress);
-    });
+    if (message.event === "activateTab") {
+      setTabId(message.data);
+      getStorage(["applicationInProgress"]).then((storage) => {
+        if (!storage.applicationInProgress) return;
+        updateNewApplication(storage.applicationInProgress);
+      });
+      return;
+    }
+    if (message.event === "updateTab") {
+      setTabId(message.data);
+      return;
+    }
   });
 
   return (

@@ -53,6 +53,10 @@ type Message =
       data: Application;
     }
   | {
+      event: "shouldEnableToggle";
+      data: number;
+    }
+  | {
       event: "toggleWindow";
       data: boolean;
     }
@@ -64,5 +68,9 @@ type Message =
     }
   | {
       event: "activateTab";
+      data: number;
+    }
+  | {
+      event: "updateTab";
       data: number;
     };

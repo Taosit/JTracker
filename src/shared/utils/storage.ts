@@ -8,6 +8,7 @@ export interface LocalStorage {
   applicationInProgress: Application;
   currentTabs: {
     id: number;
+    toggleIsEnabled: boolean;
     toggleIsOn: boolean;
   }[];
   autoReject: boolean;

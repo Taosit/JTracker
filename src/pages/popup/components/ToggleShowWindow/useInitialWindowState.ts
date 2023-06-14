@@ -2,9 +2,10 @@ import { getStorage } from "@src/shared/utils/storage";
 import { useEffect, useState } from "react";
 
 export const useInitialWindowState = () => {
-  const [shouldShowWindow, setShouldShowWindow] = useState<null | boolean>(
-    null
-  );
+  const [shouldShowWindow, setShouldShowWindow] = useState({
+    isWindowEnabled: false,
+    isWindowOpen: false,
+  });
 
   useEffect(() => {
     chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
@@ -13,10 +14,10 @@ export const useInitialWindowState = () => {
         const activeTab = storage.currentTabs.find(
           (tab) => tab.id === activeTabId
         );
-        console.log("currentTabs", storage.currentTabs);
-        console.log("activeTab", activeTab);
-        const toggleIsOn = activeTab?.toggleIsOn;
-        setShouldShowWindow(toggleIsOn);
+        setShouldShowWindow({
+          isWindowEnabled: activeTab?.toggleIsEnabled ?? false,
+          isWindowOpen: activeTab?.toggleIsOn ?? false,
+        });
       });
     });
   }, []);

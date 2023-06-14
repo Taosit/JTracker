@@ -24,6 +24,7 @@ chrome.runtime.onInstalled.addListener(() => {
     setStorage({
       currentTabs: tabs.map((tab) => ({
         id: tab.id,
+        toggleIsEnabled: false,
         toggleIsOn: false,
       })),
     });
@@ -34,83 +35,80 @@ chrome.runtime.onInstalled.addListener(() => {
     title: "Start Application",
     contexts: ["selection"],
   });
-
-  chrome.contextMenus.onClicked.addListener((info, tab) => {
-    console.log(
-      "-background: contentMenu clicked on",
-      tab.id,
-      "sending",
-      info.menuItemId
-    );
-    getStorage(["currentTabs"]).then((storage) => {
-      setStorage({
-        currentTabs: storage.currentTabs.map((currentTab) => {
-          if (currentTab.id === tab.id) {
-            return { ...currentTab, toggleIsOn: true };
-          }
-          return currentTab;
-        }),
-      });
-    });
-    if (info.menuItemId === "start-application") {
-      chrome.tabs.sendMessage(tab.id, {
-        event: "startApplication",
-        data: {
-          url: tab.url,
-          title: info.selectionText,
-        },
-      });
-      chrome.tabs.sendMessage(tab.id, {
-        event: "openWindow",
-        data: {
-          page: 0,
-        },
-      });
-      return;
-    }
-    if (info.menuItemId === "add-question") {
-      chrome.tabs.sendMessage(tab.id, {
-        event: "addQuestion",
-        data: info.selectionText,
-      });
-      chrome.tabs.sendMessage(tab.id, {
-        event: "openWindow",
-        data: {
-          page: 1,
-        },
-      });
-      return;
-    }
-    if (info.menuItemId === "add-answer") {
-      chrome.tabs.sendMessage(tab.id, {
-        event: "addAnswer",
-        data: info.selectionText,
-      });
-      chrome.tabs.sendMessage(tab.id, {
-        event: "openWindow",
-        data: {
-          page: 1,
-        },
-      });
-    }
-  });
 });
 
+chrome.contextMenus.onClicked.addListener((info, tab) => {
+  console.log(
+    "-background: contentMenu clicked on",
+    tab.id,
+    "sending",
+    info.menuItemId
+  );
+  getStorage(["currentTabs"]).then((storage) => {
+    setStorage({
+      currentTabs: storage.currentTabs.map((currentTab) => {
+        if (currentTab.id === tab.id) {
+          return { ...currentTab, toggleIsOn: true };
+        }
+        return currentTab;
+      }),
+    });
+  });
+  if (info.menuItemId === "start-application") {
+    chrome.tabs.sendMessage(tab.id, {
+      event: "startApplication",
+      data: {
+        url: tab.url,
+        title: info.selectionText,
+      },
+    });
+    chrome.tabs.sendMessage(tab.id, {
+      event: "openWindow",
+      data: {
+        page: 0,
+      },
+    });
+    return;
+  }
+  if (info.menuItemId === "add-question") {
+    chrome.tabs.sendMessage(tab.id, {
+      event: "addQuestion",
+      data: info.selectionText,
+    });
+    chrome.tabs.sendMessage(tab.id, {
+      event: "openWindow",
+      data: {
+        page: 1,
+      },
+    });
+    return;
+  }
+  if (info.menuItemId === "add-answer") {
+    chrome.tabs.sendMessage(tab.id, {
+      event: "addAnswer",
+      data: info.selectionText,
+    });
+    chrome.tabs.sendMessage(tab.id, {
+      event: "openWindow",
+      data: {
+        page: 1,
+      },
+    });
+  }
+});
+
+// Send tabId so that content script can set window status based on storage and url
 chrome.tabs.onUpdated.addListener((tabId, changeInfo) => {
   if (changeInfo.status !== "complete") return;
-  getStorage(["currentTabs"]).then((storage) => {
-    const activeTab = storage.currentTabs.find((tab) => tab.id === tabId);
-    if (!activeTab || !activeTab.toggleIsOn) return;
-    console.log("-background: tab updated and sending toggle", tabId);
-    setTimeout(() => {
-      chrome.tabs.sendMessage(tabId, {
-        event: "toggleWindow",
-        data: true,
-      });
-    }, 300);
-  });
+  setTimeout(() => {
+    chrome.tabs.sendMessage(tabId, {
+      event: "updateTab",
+      data: tabId,
+    });
+  }, 300);
 });
 
+// Send message to sync applicationInProgress
 chrome.tabs.onActivated.addListener((activeInfo) => {
   chrome.tabs.sendMessage(activeInfo.tabId, {
     event: "activateTab",
@@ -118,6 +116,7 @@ chrome.tabs.onActivated.addListener((activeInfo) => {
   });
 });
 
+// Keep track of tabs and their toggle status
 chrome.tabs.onCreated.addListener((tab) => {
   getStorage(["currentTabs"]).then((storage) => {
     const tabAlreadyExists = storage.currentTabs.some(
@@ -125,7 +124,10 @@ chrome.tabs.onCreated.addListener((tab) => {
     );
     if (tabAlreadyExists) return;
     setStorage({
-      currentTabs: [...storage.currentTabs, { id: tab.id, toggleIsOn: false }],
+      currentTabs: [
+        ...storage.currentTabs,
+        { id: tab.id, toggleIsEnabled: false, toggleIsOn: false },
+      ],
     });
   });
 });
@@ -138,6 +140,7 @@ chrome.tabs.onRemoved.addListener((tabId) => {
   });
 });
 
+// Update context menu based on applicationInProgress
 chrome.runtime.onMessage.addListener(async (message: Message) => {
   const { event, data } = message;
   if (event === "setApplicationInProgress") {

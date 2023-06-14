@@ -1,9 +1,11 @@
 import { useEffect, useRef } from "react";
 import styles from "./ToggleShowWindow.module.css";
 import { useToggle } from "./useToggle";
+import { useInitialWindowState } from "./useInitialWindowState";
 
 export const ToggleShowWindow = () => {
-  const { shouldShowWindow, toggleWindow } = useToggle();
+  const { isWindowEnabled, isWindowOpen } = useInitialWindowState();
+  const { shouldShowWindow, toggleWindow } = useToggle(isWindowOpen);
   const sliderRef = useRef<HTMLSpanElement>(null);
 
   useEffect(() => {
@@ -20,7 +22,7 @@ export const ToggleShowWindow = () => {
         <input
           type="checkbox"
           checked={shouldShowWindow}
-          disabled={shouldShowWindow === null}
+          disabled={!isWindowEnabled}
           onChange={toggleWindow}
           onKeyDown={(e) => {
             if (e.key === "Enter") {
