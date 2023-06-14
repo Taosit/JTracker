@@ -1,13 +1,18 @@
 import { useCallback } from "react";
-import { useNewApplication } from "../contexts/NewApplicationContext";
+import { useNewApplicationStore } from "../../stores/NewApplicationStore";
 
 export const useApplicationTransformer = (
   event: string,
   callback: (application: Application, message: Message) => Application
 ) => {
-  const { newApplication, updateNewApplication } = useNewApplication();
+  const newApplication = useNewApplicationStore(
+    (state) => state.newApplication
+  );
+  const updateNewApplication = useNewApplicationStore(
+    (state) => state.updateNewApplication
+  );
 
-  const listner = useCallback(
+  const listener = useCallback(
     (message: Message) => {
       if (message.event !== event) return;
       const application = callback(newApplication, message);
@@ -16,5 +21,5 @@ export const useApplicationTransformer = (
     [callback, event, newApplication, updateNewApplication]
   );
 
-  return listner;
+  return listener;
 };

@@ -1,4 +1,12 @@
 import { useId } from "react";
+import {
+  Input,
+  InputContainer,
+  InputRow,
+  Textarea,
+  DeleteButton,
+  Label,
+} from "./InputGroupStyles";
 
 type Props = {
   label: string;
@@ -17,17 +25,17 @@ export const InputGroup = ({
 }: Props) => {
   const id = useId();
   return (
-    <div className="input-container">
-      <label htmlFor={id}>{label}</label>
-      <div className="input-row">
+    <InputContainer>
+      <Label htmlFor={id}>{label}</Label>
+      <InputRow>
         {multiline ? (
-          <textarea
+          <Textarea
             id={id}
             value={value}
             onChange={(e) => onChange(e.target.value)}
           />
         ) : (
-          <input
+          <Input
             type="text"
             id={id}
             value={value}
@@ -35,14 +43,14 @@ export const InputGroup = ({
           />
         )}
         {onDelete && (
-          <button type="button" onClick={() => onDelete()}>
+          <DeleteButton type="button" onClick={() => onDelete()}>
             <img
               src="https://res.cloudinary.com/del89ro4h/image/upload/v1685753180/carbon_close-outline_dgmwc1.svg"
               alt="delete text"
             />
-          </button>
+          </DeleteButton>
         )}
-      </div>
-    </div>
+      </InputRow>
+    </InputContainer>
   );
 };

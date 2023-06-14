@@ -1,4 +1,7 @@
-export const toDateString = (date: Date) => {
+import { produce } from "immer";
+
+export const toDateString = (dateAsNumber: number) => {
+  const date = new Date(dateAsNumber);
   if (date.toDateString() === new Date().toDateString()) {
     return "Today";
   }
@@ -14,37 +17,19 @@ export const toDateString = (date: Date) => {
   });
 };
 
-export const adaptApplicationToStorage = (application: Application | null) => {
-  if (!application) return null;
-  return {
-    ...application,
+export const createNewApplication = () =>
+  ({
+    id: crypto.getRandomValues(new Uint32Array(1))[0].toString(16),
+    company: "",
+    link: "",
+    stage: "ap" as const,
     application: {
-      ...application.application,
-      date: new Date(application.application.date).getTime(),
+      date: new Date().getTime(),
+      questions: [getBlankQuestion()],
+      notes: "",
     },
-    interviews: application.interviews.map((interview) => ({
-      ...interview,
-      date: new Date(interview.date).getTime(),
-    })),
-  };
-};
-
-export const adaptApplicationFromStorage = (
-  application: ApplicationWithPrimativeDate | null
-) => {
-  if (!application) return null;
-  return {
-    ...application,
-    application: {
-      ...application.application,
-      date: new Date(application.application.date),
-    },
-    interviews: application.interviews.map((interview) => ({
-      ...interview,
-      date: new Date(interview.date),
-    })),
-  } as Application;
-};
+    interviews: [],
+  } as Application);
 
 export const getBlankQuestion = () => ({
   id: crypto.getRandomValues(new Uint32Array(1))[0].toString(16),
@@ -73,21 +58,14 @@ export const addQuestion = (
   message: Message
 ): Application => {
   if (message.event !== "addQuestion") return;
-  const blankQuestion = application.application.questions.find(
+  const blankQuestionIndex = application.application.questions.findIndex(
     (question) => question.question === "" && question.answer === ""
   );
-  const questions = application.application.questions.map((question) =>
-    question.id === blankQuestion?.id
-      ? { ...question, question: message.data }
-      : question
-  );
-  return {
-    ...application,
-    application: {
-      ...application.application,
-      questions: [...questions, getBlankQuestion()],
-    },
-  };
+
+  return produce(application, (draft: Application) => {
+    draft.application.questions[blankQuestionIndex].question = message.data;
+    draft.application.questions.push(getBlankQuestion());
+  });
 };
 
 export const addAnswer = (
@@ -95,17 +73,48 @@ export const addAnswer = (
   message: Message
 ): Application => {
   if (message.event !== "addAnswer") return;
-  const incompleteQuestion = application.application.questions.find(
+  const incompleteQuestionIndex = application.application.questions.findIndex(
     (question) => question.answer === ""
   );
-  if (!incompleteQuestion) return;
-  const questions = application.application.questions.map((question) =>
-    question.id === incompleteQuestion.id
-      ? { ...question, answer: message.data }
-      : question
-  );
-  return {
-    ...application,
-    application: { ...application.application, questions },
-  };
+  if (incompleteQuestionIndex === -1) return;
+
+  return produce(application, (draft: Application) => {
+    draft.application.questions[incompleteQuestionIndex].answer = message.data;
+  });
+};
+
+const is30DaysOld = (dateAsNumber: number) => {
+  const today = new Date();
+  const thirtyDaysAgo = new Date();
+  thirtyDaysAgo.setDate(today.getDate() - 30);
+  return new Date(dateAsNumber) < thirtyDaysAgo;
+};
+
+export const rejectOldApplications = (rawApplications: Application[]) => {
+  const updatedApplications = rawApplications.map((application) => {
+    if (
+      application.stage === "ap" &&
+      is30DaysOld(application.application.date)
+    ) {
+      return {
+        ...application,
+        stage: "xx" as const,
+      };
+    }
+    return application;
+  });
+  return updatedApplications;
+};
+
+const stageOrder = ["xx", "ap", "r1", "r2", "r3", "of"] as const;
+
+export const getNextStage = (stage: typeof stageOrder[number]) => {
+  const currentStageIndex = stageOrder.indexOf(stage);
+  return stageOrder[currentStageIndex + 1];
+};
+
+export const isInterview = (
+  stage: ApplicationStage | Interview
+): stage is Interview => {
+  return (stage as Interview).round !== undefined;
 };

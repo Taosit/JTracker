@@ -1,8 +1,19 @@
+import { useEffect, useRef } from "react";
 import styles from "./ToggleShowWindow.module.css";
-import { useToggle } from "../../hooks/useToggle";
+import { useToggle } from "./useToggle";
+import { useInitialWindowState } from "./useInitialWindowState";
 
 export const ToggleShowWindow = () => {
-  const { shouldShowWindow, toggleWindow } = useToggle();
+  const { isWindowEnabled, isWindowOpen } = useInitialWindowState();
+  const { shouldShowWindow, toggleWindow } = useToggle(isWindowOpen);
+  const sliderRef = useRef<HTMLSpanElement>(null);
+
+  useEffect(() => {
+    if (!sliderRef?.current) return;
+    setTimeout(() => {
+      sliderRef.current.classList.add(styles.withTransition);
+    }, 400);
+  }, []);
 
   return (
     <div className={styles.container}>
@@ -11,7 +22,7 @@ export const ToggleShowWindow = () => {
         <input
           type="checkbox"
           checked={shouldShowWindow}
-          disabled={shouldShowWindow === null}
+          disabled={!isWindowEnabled}
           onChange={toggleWindow}
           onKeyDown={(e) => {
             if (e.key === "Enter") {
@@ -20,7 +31,7 @@ export const ToggleShowWindow = () => {
           }}
           className={styles.checkbox}
         />
-        <span className={styles.slider}></span>
+        <span className={styles.slider} ref={sliderRef}></span>
       </label>
     </div>
   );

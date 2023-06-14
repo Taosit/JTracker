@@ -1,8 +1,13 @@
-import { useNewApplication } from "../contexts/NewApplicationContext";
-import { InputGroup } from "./InputGroup";
+import { useNewApplicationStore } from "../../../stores/NewApplicationStore";
+import { InputGroup } from "../InputGroup/InputGroup";
 
 export const NoteField = () => {
-  const { newApplication, updateNewApplication } = useNewApplication();
+  const newApplication = useNewApplicationStore(
+    (state) => state.newApplication
+  );
+  const updateNewApplication = useNewApplicationStore(
+    (state) => state.updateNewApplication
+  );
 
   return (
     <InputGroup

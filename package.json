@@ -1,5 +1,5 @@
 {
-  "name": "job-application-tracker",
+  "name": "JTracker",
   "version": "0.0.1",
   "description": "",
   "license": "MIT",
@@ -13,8 +13,12 @@
   },
   "type": "module",
   "dependencies": {
+    "@emotion/react": "^11.11.1",
+    "@emotion/styled": "^11.11.0",
+    "immer": "^10.0.2",
     "react": "18.2.0",
-    "react-dom": "18.2.0"
+    "react-dom": "18.2.0",
+    "zustand": "^4.3.8"
   },
   "devDependencies": {
     "@rollup/plugin-typescript": "^8.5.0",

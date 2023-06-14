@@ -1,0 +1,36 @@
+:root {
+  --primary-dark: #1c98cd;
+  --gray-light: #e5ebee;
+}
+
+h1,
+h2,
+h3,
+p,
+label,
+option,
+input,
+td,
+summary {
+  color: #353b3e;
+}
+
+h2 {
+  font-size: 1.5rem;
+  font-weight: 400;
+}
+
+label {
+  font-size: 1rem;
+}
+
+button {
+  background: var(--primary-dark);
+  cursor: pointer;
+  border: none;
+  color: white;
+  padding: 0.25rem 0;
+  border-radius: 2px;
+  font-size: 1.125rem;
+  padding-inline: 1rem;
+}
