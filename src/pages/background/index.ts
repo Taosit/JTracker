@@ -183,21 +183,35 @@ chrome.runtime.onMessage.addListener(async (message: Message) => {
     return;
   }
   if (event === "completeApplication") {
-    const newApplication = data;
-    getStorage(["applications"]).then(({ applications }) => {
-      const filteredQuestions = newApplication.application.questions.filter(
-        (question) => question.question
-      );
-      const newApplicationWithFilteredQuestions = produce(
-        newApplication,
-        (draft) => {
-          draft.application.questions = filteredQuestions;
-        }
-      );
-      setStorage({
-        applications: [...applications, newApplicationWithFilteredQuestions],
-      });
-    });
+    const { newApplication, tabId } = data;
+    getStorage(["applications", "currentTabs", "urls"]).then(
+      ({ applications, currentTabs }) => {
+        const filteredQuestions = newApplication.application.questions.filter(
+          (question) => question.question
+        );
+        const newApplicationWithFilteredQuestions = produce(
+          newApplication,
+          (draft) => {
+            draft.application.questions = filteredQuestions;
+          }
+        );
+        setStorage({
+          applications: [...applications, newApplicationWithFilteredQuestions],
+          currentTabs: currentTabs.map((currentTab) => {
+            if (currentTab.id === tabId) {
+              return { ...currentTab, toggleIsOn: false };
+            }
+            return currentTab;
+          }),
+        });
+        setTimeout(() => {
+          chrome.tabs.sendMessage(tabId, {
+            event: "resetWindow",
+            data: null,
+          });
+        }, 500);
+      }
+    );
     chrome.contextMenus.removeAll();
     chrome.contextMenus.create({
       id: "start-application",

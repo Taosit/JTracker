@@ -9,7 +9,11 @@ import {
   PageControls,
 } from "./ControlsStyles";
 
-export const Controls = () => {
+type Props = {
+  tabId: number;
+};
+
+export const Controls = ({ tabId }: Props) => {
   const newApplication = useNewApplicationStore(
     (state) => state.newApplication
   );
@@ -24,7 +28,7 @@ export const Controls = () => {
   const completeApplication = () => {
     chrome.runtime.sendMessage({
       event: "completeApplication",
-      data: newApplication,
+      data: { newApplication, tabId },
     });
     finishApplication();
     setPage(0);

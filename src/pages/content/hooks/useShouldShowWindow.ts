@@ -5,6 +5,7 @@ import { usePageStore } from "../stores/PageStore";
 
 export const useShouldShowWindow = (id: number) => {
   const [shouldShowWindow, setShouldShowWindow] = useState(false);
+  const [trigger, setTrigger] = useState(0);
 
   const setPage = usePageStore((state) => state.setPage);
 
@@ -16,6 +17,10 @@ export const useShouldShowWindow = (id: number) => {
     if (message.event === "openWindow") {
       setShouldShowWindow(true);
       setPage(message.data.page);
+      return;
+    }
+    if (message.event === "resetWindow") {
+      setTrigger((prev) => prev + 1);
       return;
     }
   });
@@ -44,7 +49,7 @@ export const useShouldShowWindow = (id: number) => {
       setStorage({ currentTabs });
       setShouldShowWindow(toggleIsOn);
     });
-  }, [id]);
+  }, [id, trigger]);
 
   return shouldShowWindow;
 };

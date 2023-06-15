@@ -43,7 +43,7 @@ export default function App() {
     >
       <DragArea onMouseDown={startDrag} />
       <Form />
-      <Controls />
+      <Controls tabId={tabId} />
     </ContentView>
   );
 }

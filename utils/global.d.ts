@@ -50,7 +50,10 @@ type Message =
     }
   | {
       event: "completeApplication";
-      data: Application;
+      data: {
+        newApplication: Application;
+        tabId: number;
+      };
     }
   | {
       event: "shouldEnableToggle";
@@ -65,6 +68,10 @@ type Message =
       data: {
         page: number;
       };
+    }
+  | {
+      event: "resetWindow";
+      data: null;
     }
   | {
       event: "activateTab";
