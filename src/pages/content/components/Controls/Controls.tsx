@@ -17,8 +17,8 @@ export const Controls = ({ tabId }: Props) => {
   const newApplication = useNewApplicationStore(
     (state) => state.newApplication
   );
-  const finishApplication = useNewApplicationStore(
-    (state) => state.completeApplication
+  const resetApplication = useNewApplicationStore(
+    (state) => state.resetApplication
   );
   const page = usePageStore((state) => state.page);
   const setPage = usePageStore((state) => state.setPage);
@@ -30,7 +30,7 @@ export const Controls = ({ tabId }: Props) => {
       event: "completeApplication",
       data: { newApplication, tabId },
     });
-    finishApplication();
+    resetApplication();
     setPage(0);
   };
 

@@ -1,4 +1,8 @@
-import { getStorage, setStorage } from "@src/shared/utils/storage";
+import {
+  getStorage,
+  setStorage,
+  updateStorage,
+} from "@src/shared/utils/storage";
 import reloadOnUpdate from "virtual:reload-on-update-in-background-script";
 import { produce } from "immer";
 
@@ -16,7 +20,7 @@ chrome.runtime.onInstalled.addListener(() => {
   setStorage({
     applications: [],
     viewingApplicationId: null,
-    urls: [{ id: 1, url: "https://www.linkedin.com/" }],
+    urls: [],
     applicationInProgress: null,
     currentTabs: [],
   });
@@ -40,16 +44,14 @@ chrome.runtime.onInstalled.addListener(() => {
 });
 
 chrome.contextMenus.onClicked.addListener((info, tab) => {
-  getStorage(["currentTabs"]).then((storage) => {
-    setStorage({
-      currentTabs: storage.currentTabs.map((currentTab) => {
-        if (currentTab.id === tab.id) {
-          return { ...currentTab, toggleIsOn: true };
-        }
-        return currentTab;
-      }),
-    });
-  });
+  updateStorage("currentTabs", (currentTabs) =>
+    currentTabs.map((currentTab) => {
+      if (currentTab.id === tab.id) {
+        return { ...currentTab, toggleIsOn: true };
+      }
+      return currentTab;
+    })
+  );
   if (info.menuItemId === "start-application") {
     chrome.tabs.sendMessage(tab.id, {
       event: "startApplication",
@@ -95,39 +97,36 @@ chrome.contextMenus.onClicked.addListener((info, tab) => {
 
 // Keep track of tabs and their toggle status
 chrome.tabs.onCreated.addListener((tab) => {
-  getStorage(["currentTabs"]).then((storage) => {
-    const tabAlreadyExists = storage.currentTabs.some(
-      (currentTab) => currentTab.id === tab.id
-    );
-    if (tabAlreadyExists) return;
-    setStorage({
-      currentTabs: [
-        ...storage.currentTabs,
-        { id: tab.id, toggleIsEnabled: false, toggleIsOn: false },
-      ],
-    });
-  });
+  updateStorage("currentTabs", (currentTabs) => [
+    ...currentTabs,
+    { id: tab.id, toggleIsEnabled: false, toggleIsOn: false },
+  ]);
 });
 
 chrome.tabs.onRemoved.addListener((tabId) => {
-  getStorage(["currentTabs"]).then((storage) => {
-    setStorage({
-      currentTabs: storage.currentTabs.filter((tab) => tab.id !== tabId),
-    });
+  updateStorage("currentTabs", (currentTabs) =>
+    currentTabs.filter((tab) => tab.id !== tabId)
+  );
+});
+
+chrome.runtime.onConnect.addListener((port) => {
+  port.onDisconnect.addListener(() => {
+    console.log("Port disconnected");
+  });
+  port.onMessage.addListener((message: Message, port: chrome.runtime.Port) => {
+    const { event } = message;
+    const tabId = port.sender?.tab?.id;
+    if (event === "getTabId") {
+      console.log("sending tabId", tabId);
+      port.postMessage({ event: "getTabId", data: tabId });
+      return;
+    }
   });
 });
 
 // Update context menu based on applicationInProgress
-chrome.runtime.onMessage.addListener(async (message: Message, sender) => {
+chrome.runtime.onMessage.addListener(async (message: Message) => {
   const { event, data } = message;
-  if (event === "getTabId") {
-    const tabId = sender.tab?.id;
-    chrome.tabs.sendMessage(tabId, {
-      event: "updateTab",
-      data: tabId,
-    });
-    return;
-  }
   if (event === "setApplicationInProgress") {
     const applicationInProgress = data;
     chrome.contextMenus.removeAll();
@@ -162,7 +161,7 @@ chrome.runtime.onMessage.addListener(async (message: Message, sender) => {
   }
   if (event === "completeApplication") {
     const { newApplication, tabId } = data;
-    getStorage(["applications", "currentTabs", "urls"]).then(
+    getStorage(["applications", "currentTabs"]).then(
       ({ applications, currentTabs }) => {
         const filteredQuestions = newApplication.application.questions.filter(
           (question) => question.question
@@ -181,13 +180,12 @@ chrome.runtime.onMessage.addListener(async (message: Message, sender) => {
             }
             return currentTab;
           }),
-        });
-        setTimeout(() => {
+        }).then(() => {
           chrome.tabs.sendMessage(tabId, {
             event: "resetWindow",
             data: null,
           });
-        }, 500);
+        });
       }
     );
     chrome.contextMenus.removeAll();
