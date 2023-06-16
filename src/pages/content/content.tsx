@@ -5,7 +5,13 @@ import refreshOnUpdate from "virtual:reload-on-update-in-view";
 refreshOnUpdate("pages/content");
 
 const root = document.createElement("div");
-root.id = "chrome-extension-boilerplate-react-vite-content-view-root";
+root.id = "chrome-extension-content-view-root";
 document.body.append(root);
 
-createRoot(root).render(<App />);
+const renderIn = document.createElement("div");
+renderIn.id = "chrome-extension-content-view-shadow-root";
+
+const shadow = root.attachShadow({ mode: "open" });
+shadow.appendChild(renderIn);
+
+createRoot(renderIn).render(<App />);

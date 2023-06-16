@@ -22,10 +22,10 @@ export const PageButton = styled.button`
   background-color: transparent;
 
   &:focus {
-    outline: none !important;
+    outline: none;
   }
   &:focus-visible {
-    outline: 2px solid var(--primary-dark) !important;
+    outline: 2px solid var(--primary-dark);
   }
 
   &:hover {
@@ -63,11 +63,11 @@ export const DoneButton = styled.button`
   }
 
   &:focus {
-    outline: none !important;
+    outline: none;
   }
 
   &:focus-visible {
-    outline: 2px solid white !important;
+    outline: 2px solid white;
   }
 
   &:hover {

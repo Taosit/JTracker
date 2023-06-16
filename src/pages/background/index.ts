@@ -21,7 +21,8 @@ chrome.runtime.onInstalled.addListener(() => {
     currentTabs: [],
   });
 
-  chrome.tabs.query({ active: true, currentWindow: true }).then((tabs) => {
+  chrome.tabs.query({ currentWindow: true }).then((tabs) => {
+    console.log(tabs);
     setStorage({
       currentTabs: tabs.map((tab) => ({
         id: tab.id,

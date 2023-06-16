@@ -14,7 +14,7 @@ export const FormHeader = styled.div`
 
 export const FormTitle = styled.h1`
   font-size: 16px;
-  font-weight: 500 !important;
+  font-weight: 500;
   margin: 0;
   padding: 12px var(--margin-side) 0;
   color: var(--primary-dark);

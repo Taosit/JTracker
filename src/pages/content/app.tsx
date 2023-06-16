@@ -7,6 +7,8 @@ import { useNewApplicationStore } from "./stores/NewApplicationStore";
 import { getStorage } from "@src/shared/utils/storage";
 import { ContentView, DragArea } from "./AppStyles";
 import { useEffect, useState } from "react";
+import ResetStyleProvider from "./components/emotion/ResetStyleProvider";
+import EmotionCacheProvider from "./components/emotion/EmotionCacheProvider";
 
 export default function App() {
   const updateNewApplication = useNewApplicationStore(
@@ -34,16 +36,20 @@ export default function App() {
   });
 
   return (
-    <ContentView
-      style={{
-        display: shouldShowWindow ? "flex" : "none",
-        top: windowPosition[1],
-        left: windowPosition[0],
-      }}
-    >
-      <DragArea onMouseDown={startDrag} />
-      <Form />
-      <Controls tabId={tabId} />
-    </ContentView>
+    <ResetStyleProvider>
+      <EmotionCacheProvider>
+        <ContentView
+          style={{
+            display: shouldShowWindow ? "flex" : "none",
+            top: windowPosition[1],
+            left: windowPosition[0],
+          }}
+        >
+          <DragArea onMouseDown={startDrag} />
+          <Form />
+          <Controls tabId={tabId} />
+        </ContentView>
+      </EmotionCacheProvider>
+    </ResetStyleProvider>
   );
 }
