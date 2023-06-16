@@ -6,7 +6,7 @@ import { useRegisterMessageListener } from "./hooks/useRegisterMessageListener";
 import { useNewApplicationStore } from "./stores/NewApplicationStore";
 import { getStorage } from "@src/shared/utils/storage";
 import { ContentView, DragArea } from "./AppStyles";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 export default function App() {
   const updateNewApplication = useNewApplicationStore(
@@ -18,17 +18,17 @@ export default function App() {
   const { windowPosition, startDrag } = useWindowDrag();
   const shouldShowWindow = useShouldShowWindow(tabId);
 
+  useEffect(() => {
+    chrome.runtime.sendMessage({ event: "getTabId", data: null });
+  }, []);
+
   useRegisterMessageListener((message: Message) => {
-    if (message.event === "activateTab") {
+    if (message.event === "updateTab") {
       setTabId(message.data);
       getStorage(["applicationInProgress"]).then((storage) => {
         if (!storage.applicationInProgress) return;
         updateNewApplication(storage.applicationInProgress);
       });
-      return;
-    }
-    if (message.event === "updateTab") {
-      setTabId(message.data);
       return;
     }
   });

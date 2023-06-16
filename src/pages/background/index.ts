@@ -92,37 +92,6 @@ chrome.contextMenus.onClicked.addListener((info, tab) => {
   }
 });
 
-// Send tabId so that content script can set window status based on storage and url
-chrome.tabs.onUpdated.addListener((tabId, changeInfo) => {
-  if (changeInfo.status !== "complete") return;
-  setTimeout(() => {
-    chrome.tabs.sendMessage(tabId, {
-      event: "updateTab",
-      data: tabId,
-    });
-  }, 300);
-  getStorage(["currentTabs"]).then((storage) => {
-    const tabAlreadyExists = storage.currentTabs.some(
-      (currentTab) => currentTab.id === tabId
-    );
-    if (tabAlreadyExists) return;
-    setStorage({
-      currentTabs: [
-        ...storage.currentTabs,
-        { id: tabId, toggleIsEnabled: false, toggleIsOn: false },
-      ],
-    });
-  });
-});
-
-// Send message to sync applicationInProgress
-chrome.tabs.onActivated.addListener((activeInfo) => {
-  chrome.tabs.sendMessage(activeInfo.tabId, {
-    event: "activateTab",
-    data: activeInfo.tabId,
-  });
-});
-
 // Keep track of tabs and their toggle status
 chrome.tabs.onCreated.addListener((tab) => {
   getStorage(["currentTabs"]).then((storage) => {
@@ -148,8 +117,16 @@ chrome.tabs.onRemoved.addListener((tabId) => {
 });
 
 // Update context menu based on applicationInProgress
-chrome.runtime.onMessage.addListener(async (message: Message) => {
+chrome.runtime.onMessage.addListener(async (message: Message, sender) => {
   const { event, data } = message;
+  if (event === "getTabId") {
+    const tabId = sender.tab?.id;
+    chrome.tabs.sendMessage(tabId, {
+      event: "updateTab",
+      data: tabId,
+    });
+    return;
+  }
   if (event === "setApplicationInProgress") {
     const applicationInProgress = data;
     chrome.contextMenus.removeAll();
