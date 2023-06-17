@@ -2,11 +2,13 @@ import { Form } from "./components/Form/Form";
 import { Controls } from "./components/Controls/Controls";
 import { useShouldShowWindow } from "./hooks/useShouldShowWindow";
 import { useWindowDrag } from "./hooks/useWindowDrag";
-import { useRegisterMessageListener } from "./hooks/useRegisterMessageListener";
 import { useNewApplicationStore } from "./stores/NewApplicationStore";
 import { getStorage } from "@src/shared/utils/storage";
 import { ContentView, DragArea } from "./AppStyles";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import ResetStyleProvider from "./components/emotion/ResetStyleProvider";
+import EmotionCacheProvider from "./components/emotion/EmotionCacheProvider";
+import { sendMessageToBackground } from "@src/shared/utils/message";
 
 export default function App() {
   const updateNewApplication = useNewApplicationStore(
@@ -18,32 +20,36 @@ export default function App() {
   const { windowPosition, startDrag } = useWindowDrag();
   const shouldShowWindow = useShouldShowWindow(tabId);
 
-  useRegisterMessageListener((message: Message) => {
-    if (message.event === "activateTab") {
-      setTabId(message.data);
-      getStorage(["applicationInProgress"]).then((storage) => {
-        if (!storage.applicationInProgress) return;
-        updateNewApplication(storage.applicationInProgress);
-      });
-      return;
-    }
-    if (message.event === "updateTab") {
-      setTabId(message.data);
-      return;
-    }
-  });
+  useEffect(() => {
+    const disconnect = sendMessageToBackground(
+      { event: "getTabId", data: null },
+      (response) => {
+        setTabId(response);
+        getStorage(["applicationInProgress"]).then((storage) => {
+          if (!storage.applicationInProgress) return;
+          updateNewApplication(storage.applicationInProgress);
+        });
+      }
+    );
+
+    return disconnect;
+  }, [updateNewApplication]);
 
   return (
-    <ContentView
-      style={{
-        display: shouldShowWindow ? "flex" : "none",
-        top: windowPosition[1],
-        left: windowPosition[0],
-      }}
-    >
-      <DragArea onMouseDown={startDrag} />
-      <Form />
-      <Controls tabId={tabId} />
-    </ContentView>
+    <ResetStyleProvider>
+      <EmotionCacheProvider>
+        <ContentView
+          style={{
+            display: shouldShowWindow ? "flex" : "none",
+            top: windowPosition[1],
+            left: windowPosition[0],
+          }}
+        >
+          <DragArea onMouseDown={startDrag} />
+          <Form />
+          <Controls tabId={tabId} />
+        </ContentView>
+      </EmotionCacheProvider>
+    </ResetStyleProvider>
   );
 }

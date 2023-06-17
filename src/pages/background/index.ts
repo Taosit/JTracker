@@ -1,4 +1,8 @@
-import { getStorage, setStorage } from "@src/shared/utils/storage";
+import {
+  getStorage,
+  setStorage,
+  updateStorage,
+} from "@src/shared/utils/storage";
 import reloadOnUpdate from "virtual:reload-on-update-in-background-script";
 import { produce } from "immer";
 
@@ -10,18 +14,16 @@ reloadOnUpdate("pages/background");
  */
 reloadOnUpdate("pages/content/style.css");
 
-console.log("background loaded");
-
 chrome.runtime.onInstalled.addListener(() => {
   setStorage({
     applications: [],
     viewingApplicationId: null,
-    urls: [{ id: 1, url: "https://www.linkedin.com/" }],
+    urls: [],
     applicationInProgress: null,
     currentTabs: [],
   });
 
-  chrome.tabs.query({ active: true, currentWindow: true }).then((tabs) => {
+  chrome.tabs.query({ currentWindow: true }).then((tabs) => {
     setStorage({
       currentTabs: tabs.map((tab) => ({
         id: tab.id,
@@ -39,16 +41,14 @@ chrome.runtime.onInstalled.addListener(() => {
 });
 
 chrome.contextMenus.onClicked.addListener((info, tab) => {
-  getStorage(["currentTabs"]).then((storage) => {
-    setStorage({
-      currentTabs: storage.currentTabs.map((currentTab) => {
-        if (currentTab.id === tab.id) {
-          return { ...currentTab, toggleIsOn: true };
-        }
-        return currentTab;
-      }),
-    });
-  });
+  updateStorage("currentTabs", (currentTabs) =>
+    currentTabs.map((currentTab) => {
+      if (currentTab.id === tab.id) {
+        return { ...currentTab, toggleIsOn: true };
+      }
+      return currentTab;
+    })
+  );
   if (info.menuItemId === "start-application") {
     chrome.tabs.sendMessage(tab.id, {
       event: "startApplication",
@@ -92,58 +92,28 @@ chrome.contextMenus.onClicked.addListener((info, tab) => {
   }
 });
 
-// Send tabId so that content script can set window status based on storage and url
-chrome.tabs.onUpdated.addListener((tabId, changeInfo) => {
-  if (changeInfo.status !== "complete") return;
-  setTimeout(() => {
-    chrome.tabs.sendMessage(tabId, {
-      event: "updateTab",
-      data: tabId,
-    });
-  }, 300);
-  getStorage(["currentTabs"]).then((storage) => {
-    const tabAlreadyExists = storage.currentTabs.some(
-      (currentTab) => currentTab.id === tabId
-    );
-    if (tabAlreadyExists) return;
-    setStorage({
-      currentTabs: [
-        ...storage.currentTabs,
-        { id: tabId, toggleIsEnabled: false, toggleIsOn: false },
-      ],
-    });
-  });
-});
-
-// Send message to sync applicationInProgress
-chrome.tabs.onActivated.addListener((activeInfo) => {
-  chrome.tabs.sendMessage(activeInfo.tabId, {
-    event: "activateTab",
-    data: activeInfo.tabId,
-  });
-});
-
 // Keep track of tabs and their toggle status
 chrome.tabs.onCreated.addListener((tab) => {
-  getStorage(["currentTabs"]).then((storage) => {
-    const tabAlreadyExists = storage.currentTabs.some(
-      (currentTab) => currentTab.id === tab.id
-    );
-    if (tabAlreadyExists) return;
-    setStorage({
-      currentTabs: [
-        ...storage.currentTabs,
-        { id: tab.id, toggleIsEnabled: false, toggleIsOn: false },
-      ],
-    });
-  });
+  updateStorage("currentTabs", (currentTabs) => [
+    ...currentTabs,
+    { id: tab.id, toggleIsEnabled: false, toggleIsOn: false },
+  ]);
 });
 
 chrome.tabs.onRemoved.addListener((tabId) => {
-  getStorage(["currentTabs"]).then((storage) => {
-    setStorage({
-      currentTabs: storage.currentTabs.filter((tab) => tab.id !== tabId),
-    });
+  updateStorage("currentTabs", (currentTabs) =>
+    currentTabs.filter((tab) => tab.id !== tabId)
+  );
+});
+
+chrome.runtime.onConnect.addListener((port) => {
+  port.onMessage.addListener((message: Message, port: chrome.runtime.Port) => {
+    const { event } = message;
+    const tabId = port.sender?.tab?.id;
+    if (event === "getTabId") {
+      port.postMessage({ event: "getTabId", data: tabId });
+      return;
+    }
   });
 });
 
@@ -184,7 +154,7 @@ chrome.runtime.onMessage.addListener(async (message: Message) => {
   }
   if (event === "completeApplication") {
     const { newApplication, tabId } = data;
-    getStorage(["applications", "currentTabs", "urls"]).then(
+    getStorage(["applications", "currentTabs"]).then(
       ({ applications, currentTabs }) => {
         const filteredQuestions = newApplication.application.questions.filter(
           (question) => question.question
@@ -203,13 +173,12 @@ chrome.runtime.onMessage.addListener(async (message: Message) => {
             }
             return currentTab;
           }),
-        });
-        setTimeout(() => {
+        }).then(() => {
           chrome.tabs.sendMessage(tabId, {
             event: "resetWindow",
             data: null,
           });
-        }, 500);
+        });
       }
     );
     chrome.contextMenus.removeAll();

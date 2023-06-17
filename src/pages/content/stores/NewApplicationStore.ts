@@ -11,7 +11,7 @@ type State = {
 
 type Actions = {
   updateNewApplication: (application: Application) => void;
-  completeApplication: () => void;
+  resetApplication: () => void;
 };
 
 const chromeStorage = {
@@ -47,7 +47,7 @@ export const useNewApplicationStore = create(
           data: application,
         });
       },
-      completeApplication: () => {
+      resetApplication: () => {
         set((state) => {
           state.newApplication = createNewApplication();
         });

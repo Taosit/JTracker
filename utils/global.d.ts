@@ -74,8 +74,8 @@ type Message =
       data: null;
     }
   | {
-      event: "activateTab";
-      data: number;
+      event: "getTabId";
+      data: null;
     }
   | {
       event: "updateTab";
