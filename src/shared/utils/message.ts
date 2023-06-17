@@ -6,14 +6,9 @@ export function sendMessageToBackground<M extends Message>(
   port.onMessage.addListener((responseMessage: Message) => {
     handleSuccess?.(responseMessage.data);
   });
-  port.onDisconnect.addListener(() => console.log("Port disconnected"));
-  try {
-    port.postMessage(message);
-  } catch (error) {
-    console.log(error);
-  }
+  port.postMessage(message);
   const disconnect = () => {
     port.disconnect();
   };
-  return { disconnect };
+  return disconnect;
 }

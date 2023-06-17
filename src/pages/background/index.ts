@@ -14,8 +14,6 @@ reloadOnUpdate("pages/background");
  */
 reloadOnUpdate("pages/content/style.css");
 
-console.log("background loaded");
-
 chrome.runtime.onInstalled.addListener(() => {
   setStorage({
     applications: [],
@@ -26,7 +24,6 @@ chrome.runtime.onInstalled.addListener(() => {
   });
 
   chrome.tabs.query({ currentWindow: true }).then((tabs) => {
-    console.log(tabs);
     setStorage({
       currentTabs: tabs.map((tab) => ({
         id: tab.id,
@@ -110,14 +107,10 @@ chrome.tabs.onRemoved.addListener((tabId) => {
 });
 
 chrome.runtime.onConnect.addListener((port) => {
-  port.onDisconnect.addListener(() => {
-    console.log("Port disconnected");
-  });
   port.onMessage.addListener((message: Message, port: chrome.runtime.Port) => {
     const { event } = message;
     const tabId = port.sender?.tab?.id;
     if (event === "getTabId") {
-      console.log("sending tabId", tabId);
       port.postMessage({ event: "getTabId", data: tabId });
       return;
     }

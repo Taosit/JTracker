@@ -34,7 +34,6 @@ export const useShouldShowWindow = (id: number) => {
       );
       const activeTab = storage.currentTabs.find((tab) => tab.id === id);
       const toggleIsOn = isAlwaysOpen || activeTab?.toggleIsOn;
-      console.log("tabs", storage.currentTabs, "tab", id);
       const currentTabs = storage.currentTabs.map((tab) => {
         if (tab.id !== id) return tab;
         return { ...tab, toggleIsEnabled: true, toggleIsOn };

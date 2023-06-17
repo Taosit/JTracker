@@ -21,13 +21,18 @@ export default function App() {
   const shouldShowWindow = useShouldShowWindow(tabId);
 
   useEffect(() => {
-    sendMessageToBackground({ event: "getTabId", data: null }, (response) => {
-      setTabId(response);
-      getStorage(["applicationInProgress"]).then((storage) => {
-        if (!storage.applicationInProgress) return;
-        updateNewApplication(storage.applicationInProgress);
-      });
-    });
+    const disconnect = sendMessageToBackground(
+      { event: "getTabId", data: null },
+      (response) => {
+        setTabId(response);
+        getStorage(["applicationInProgress"]).then((storage) => {
+          if (!storage.applicationInProgress) return;
+          updateNewApplication(storage.applicationInProgress);
+        });
+      }
+    );
+
+    return disconnect;
   }, [updateNewApplication]);
 
   return (

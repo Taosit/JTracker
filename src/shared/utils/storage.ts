@@ -40,16 +40,20 @@ export async function updateStorage<K extends keyof LocalStorage>(
   await setStorage({ [key]: newValue });
 }
 
-// export async function updateStorage<
-//   K extends keyof LocalStorage
-// >(transformers: {
-//   [key in K]: (value: LocalStorage[key]) => LocalStorage[key];
-// }) {
-//   const currentStorage = await getStorage(Object.keys(transformers));
-//   const newStorage = Object.entries(transformers).reduce(
-//     (storage, [key, transformer]) => {
-//       return { ...storage, [key]: transformer(currentStorage[key]) };
-//     }
-//   );
-//   await setStorage(newStorage);
+// type Transformer<K extends keyof LocalStorage> = (
+//   value: LocalStorage[K]
+// ) => LocalStorage[K];
+// export async function updateStorage<K extends keyof LocalStorage>(
+//   transformers: Map<K, Transformer<K>>
+// ) {
+//   const keys = Array.from(transformers.keys());
+//   const currentStorage = await getStorage(keys);
+//   const storageWithUpdatedKeys = keys.reduce<
+//     Partial<{ [key in K]: LocalStorage[key] }>
+//   >((storage, key) => {
+//     storage[key] = transformers.get(key)(currentStorage[key]);
+//     return storage;
+//   }, {});
+
+//   await setStorage(storageWithUpdatedKeys);
 // }
