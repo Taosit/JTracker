@@ -3,6 +3,7 @@ import { StageDetails } from "./StageDetails/StageDetails";
 import { setStorage } from "@src/shared/utils/storage";
 import { useApplicationStore } from "../../stores/applicationStore";
 import { StageContextProvider } from "./StageDetails/useStage";
+import { useLayoutEffect, useRef } from "react";
 
 export const ApplicationDetails = () => {
   const applications = useApplicationStore((state) => state.applications);
@@ -13,6 +14,8 @@ export const ApplicationDetails = () => {
     (state) => state.setviewingApplicationId
   );
 
+  const backlinkRef = useRef<HTMLDivElement>(null);
+
   const viewingApplication = applications.find(
     (application) => application.id === viewingApplicationId
   );
@@ -22,9 +25,15 @@ export const ApplicationDetails = () => {
     setStorage({ viewingApplicationId: null });
   };
 
+  useLayoutEffect(() => {
+    if (backlinkRef.current) {
+      backlinkRef.current.scrollIntoView();
+    }
+  }, []);
+
   return (
     <>
-      <div className={styles.backlinkContainer}>
+      <div className={styles.backlinkContainer} ref={backlinkRef}>
         <button
           className={styles.backlink}
           onClick={setAndSaveviewingApplicationIdToNull}
