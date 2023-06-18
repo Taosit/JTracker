@@ -45,15 +45,8 @@ type Message =
       data: string;
     }
   | {
-      event: "setApplicationInProgress";
-      data: Application;
-    }
-  | {
-      event: "completeApplication";
-      data: {
-        newApplication: Application;
-        tabId: number;
-      };
+      event: "updateContextMenus";
+      data: null;
     }
   | {
       event: "shouldEnableToggle";
@@ -68,10 +61,6 @@ type Message =
       data: {
         page: number;
       };
-    }
-  | {
-      event: "resetWindow";
-      data: null;
     }
   | {
       event: "getTabId";

@@ -4,7 +4,8 @@ import {
   updateStorage,
 } from "@src/shared/utils/storage";
 import reloadOnUpdate from "virtual:reload-on-update-in-background-script";
-import { produce } from "immer";
+import { updateContextMenus } from "@src/shared/utils/contextMenu";
+import { getActiveTabId } from "@src/shared/utils/helpers";
 
 reloadOnUpdate("pages/background");
 
@@ -32,33 +33,30 @@ chrome.runtime.onInstalled.addListener(() => {
       })),
     });
   });
-
-  chrome.contextMenus.create({
-    id: "start-application",
-    title: "Start Application",
-    contexts: ["selection"],
-  });
 });
 
-chrome.contextMenus.onClicked.addListener((info, tab) => {
-  updateStorage({
-    currentTabs: (currentTabs) =>
-      currentTabs.map((currentTab) => {
-        if (currentTab.id === tab.id) {
-          return { ...currentTab, toggleIsOn: true };
-        }
-        return currentTab;
-      }),
-  });
+chrome.contextMenus.onClicked.addListener(async (info, tab) => {
+  if (tab.id !== -1) {
+    updateStorage({
+      currentTabs: (currentTabs) =>
+        currentTabs.map((currentTab) => {
+          if (currentTab.id === tab.id) {
+            return { ...currentTab, toggleIsOn: true };
+          }
+          return currentTab;
+        }),
+    });
+  }
+  const tabId = tab.id > -1 ? tab.id : await getActiveTabId();
   if (info.menuItemId === "start-application") {
-    chrome.tabs.sendMessage(tab.id, {
+    chrome.tabs.sendMessage(tabId, {
       event: "startApplication",
       data: {
         url: tab.url,
         title: info.selectionText,
       },
     });
-    chrome.tabs.sendMessage(tab.id, {
+    chrome.tabs.sendMessage(tabId, {
       event: "openWindow",
       data: {
         page: 0,
@@ -67,11 +65,11 @@ chrome.contextMenus.onClicked.addListener((info, tab) => {
     return;
   }
   if (info.menuItemId === "add-question") {
-    chrome.tabs.sendMessage(tab.id, {
+    chrome.tabs.sendMessage(tabId, {
       event: "addQuestion",
       data: info.selectionText,
     });
-    chrome.tabs.sendMessage(tab.id, {
+    chrome.tabs.sendMessage(tabId, {
       event: "openWindow",
       data: {
         page: 1,
@@ -80,11 +78,11 @@ chrome.contextMenus.onClicked.addListener((info, tab) => {
     return;
   }
   if (info.menuItemId === "add-answer") {
-    chrome.tabs.sendMessage(tab.id, {
+    chrome.tabs.sendMessage(tabId, {
       event: "addAnswer",
       data: info.selectionText,
     });
-    chrome.tabs.sendMessage(tab.id, {
+    chrome.tabs.sendMessage(tabId, {
       event: "openWindow",
       data: {
         page: 1,
@@ -103,6 +101,16 @@ chrome.tabs.onCreated.addListener((tab) => {
   });
 });
 
+chrome.tabs.onActivated.addListener(async (activeInfo) => {
+  const tabs = (await getStorage(["currentTabs"])).currentTabs;
+  const currentTab = tabs.find((tab) => tab.id === activeInfo.tabId);
+  if (currentTab?.toggleIsEnabled) {
+    updateContextMenus();
+  } else {
+    chrome.contextMenus.removeAll();
+  }
+});
+
 chrome.tabs.onRemoved.addListener((tabId) => {
   updateStorage({
     currentTabs: (currentTabs) => currentTabs.filter((tab) => tab.id !== tabId),
@@ -110,6 +118,7 @@ chrome.tabs.onRemoved.addListener((tabId) => {
 });
 
 chrome.runtime.onConnect.addListener((port) => {
+  updateContextMenus();
   port.onMessage.addListener((message: Message, port: chrome.runtime.Port) => {
     const { event } = message;
     const tabId = port.sender?.tab?.id;
@@ -122,73 +131,9 @@ chrome.runtime.onConnect.addListener((port) => {
 
 // Update context menu based on applicationInProgress
 chrome.runtime.onMessage.addListener(async (message: Message) => {
-  const { event, data } = message;
-  if (event === "setApplicationInProgress") {
-    const applicationInProgress = data;
-    chrome.contextMenus.removeAll();
-    if (
-      !applicationInProgress ||
-      (!applicationInProgress.company && !applicationInProgress.link)
-    ) {
-      chrome.contextMenus.create({
-        id: "start-application",
-        title: "Start Application",
-        contexts: ["selection"],
-      });
-    } else {
-      chrome.contextMenus.create({
-        id: "add-question",
-        title: "Add Question",
-        contexts: ["selection"],
-      });
-      const incompleteQuestion =
-        applicationInProgress.application.questions.find(
-          (question) => !question.question || !question.answer
-        );
-      if (incompleteQuestion?.question) {
-        chrome.contextMenus.create({
-          id: "add-answer",
-          title: "Add Answer",
-          contexts: ["selection"],
-        });
-      }
-    }
+  const { event } = message;
+  if (event === "updateContextMenus") {
+    updateContextMenus();
     return;
-  }
-  if (event === "completeApplication") {
-    const { newApplication, tabId } = data;
-    getStorage(["applications", "currentTabs"]).then(
-      ({ applications, currentTabs }) => {
-        const filteredQuestions = newApplication.application.questions.filter(
-          (question) => question.question
-        );
-        const newApplicationWithFilteredQuestions = produce(
-          newApplication,
-          (draft) => {
-            draft.application.questions = filteredQuestions;
-          }
-        );
-        setStorage({
-          applications: [...applications, newApplicationWithFilteredQuestions],
-          currentTabs: currentTabs.map((currentTab) => {
-            if (currentTab.id === tabId) {
-              return { ...currentTab, toggleIsOn: false };
-            }
-            return currentTab;
-          }),
-        }).then(() => {
-          chrome.tabs.sendMessage(tabId, {
-            event: "resetWindow",
-            data: null,
-          });
-        });
-      }
-    );
-    chrome.contextMenus.removeAll();
-    chrome.contextMenus.create({
-      id: "start-application",
-      title: "Start Application",
-      contexts: ["selection"],
-    });
   }
 });

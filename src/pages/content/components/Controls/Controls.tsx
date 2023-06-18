@@ -1,3 +1,4 @@
+import { updateStorage } from "@src/shared/utils/storage";
 import { useNewApplicationStore } from "../../stores/NewApplicationStore";
 import { usePageStore } from "../../stores/PageStore";
 import {
@@ -8,12 +9,14 @@ import {
   PageButton,
   PageControls,
 } from "./ControlsStyles";
+import { produce } from "immer";
 
 type Props = {
   tabId: number;
+  setTrigger: React.Dispatch<React.SetStateAction<number>>;
 };
 
-export const Controls = ({ tabId }: Props) => {
+export const Controls = ({ tabId, setTrigger }: Props) => {
   const newApplication = useNewApplicationStore(
     (state) => state.newApplication
   );
@@ -25,13 +28,28 @@ export const Controls = ({ tabId }: Props) => {
 
   const pageOrder = ["general", "questions", "notes"];
 
-  const completeApplication = () => {
-    chrome.runtime.sendMessage({
-      event: "completeApplication",
-      data: { newApplication, tabId },
+  const completeApplication = async () => {
+    await updateStorage({
+      currentTabs: (currentTabs) =>
+        currentTabs.map((currentTab) => {
+          if (currentTab.id === tabId) {
+            return { ...currentTab, toggleIsOn: false };
+          }
+          return currentTab;
+        }),
+      applications: (applications) => [
+        ...applications,
+        produce(newApplication, (draft) => {
+          draft.application.questions =
+            newApplication.application.questions.filter(
+              (question) => question.question
+            );
+        }),
+      ],
     });
     resetApplication();
     setPage(0);
+    setTrigger((trigger) => trigger + 1);
   };
 
   const isDisabled = !newApplication?.company || !newApplication?.link;

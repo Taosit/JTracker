@@ -118,3 +118,11 @@ export const isInterview = (
 ): stage is Interview => {
   return (stage as Interview).round !== undefined;
 };
+
+export const getActiveTabId = () => {
+  return new Promise<number>((resolve) => {
+    chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+      resolve(tabs[0].id);
+    });
+  });
+};

@@ -16,9 +16,10 @@ export default function App() {
   );
 
   const [tabId, setTabId] = useState(0);
+  const [trigger, setTrigger] = useState(0);
 
   const { windowPosition, startDrag } = useWindowDrag();
-  const shouldShowWindow = useShouldShowWindow(tabId);
+  const shouldShowWindow = useShouldShowWindow(tabId, trigger);
 
   useEffect(() => {
     const disconnect = sendMessageToBackground(
@@ -47,7 +48,7 @@ export default function App() {
         >
           <DragArea onMouseDown={startDrag} />
           <Form />
-          <Controls tabId={tabId} />
+          <Controls tabId={tabId} setTrigger={setTrigger} />
         </ContentView>
       </EmotionCacheProvider>
     </ResetStyleProvider>

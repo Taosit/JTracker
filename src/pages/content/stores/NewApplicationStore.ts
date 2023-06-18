@@ -25,11 +25,15 @@ const chromeStorage = {
     };
     return JSON.stringify(result);
   },
-  setItem: (_: string, value: string) => {
+  setItem: async (_: string, value: string) => {
     const {
       state: { newApplication },
     } = JSON.parse(value);
-    setStorage({ applicationInProgress: newApplication });
+    await setStorage({ applicationInProgress: newApplication });
+    chrome.runtime.sendMessage({
+      event: "updateContextMenus",
+      data: null,
+    });
   },
   removeItem: () => undefined,
 };
@@ -41,10 +45,6 @@ export const useNewApplicationStore = create(
       updateNewApplication: (application) => {
         set((state) => {
           state.newApplication = application;
-        });
-        chrome.runtime.sendMessage({
-          event: "setApplicationInProgress",
-          data: application,
         });
       },
       resetApplication: () => {

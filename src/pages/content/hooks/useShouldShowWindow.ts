@@ -3,9 +3,8 @@ import { useEffect, useState } from "react";
 import { useRegisterMessageListener } from "./useRegisterMessageListener";
 import { usePageStore } from "../stores/PageStore";
 
-export const useShouldShowWindow = (id: number) => {
+export const useShouldShowWindow = (id: number, trigger: number) => {
   const [shouldShowWindow, setShouldShowWindow] = useState(false);
-  const [trigger, setTrigger] = useState(0);
 
   const setPage = usePageStore((state) => state.setPage);
 
@@ -17,10 +16,6 @@ export const useShouldShowWindow = (id: number) => {
     if (message.event === "openWindow") {
       setShouldShowWindow(true);
       setPage(message.data.page);
-      return;
-    }
-    if (message.event === "resetWindow") {
-      setTrigger((prev) => prev + 1);
       return;
     }
   });

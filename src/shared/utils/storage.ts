@@ -31,15 +31,6 @@ export function getStorage<K extends keyof LocalStorage>(keys: K[]) {
   });
 }
 
-// export async function updateStorage<K extends keyof LocalStorage>(
-//   key: K,
-//   callback: (value: LocalStorage[K]) => LocalStorage[K]
-// ) {
-//   const currentValue = (await getStorage([key]))[key];
-//   const newValue = callback(currentValue);
-//   await setStorage({ [key]: newValue });
-// }
-
 export async function updateStorage<K extends keyof LocalStorage>(
   transformers: Partial<{
     [key in K]: (value: LocalStorage[key]) => LocalStorage[key];
