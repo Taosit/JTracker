@@ -41,14 +41,15 @@ chrome.runtime.onInstalled.addListener(() => {
 });
 
 chrome.contextMenus.onClicked.addListener((info, tab) => {
-  updateStorage("currentTabs", (currentTabs) =>
-    currentTabs.map((currentTab) => {
-      if (currentTab.id === tab.id) {
-        return { ...currentTab, toggleIsOn: true };
-      }
-      return currentTab;
-    })
-  );
+  updateStorage({
+    currentTabs: (currentTabs) =>
+      currentTabs.map((currentTab) => {
+        if (currentTab.id === tab.id) {
+          return { ...currentTab, toggleIsOn: true };
+        }
+        return currentTab;
+      }),
+  });
   if (info.menuItemId === "start-application") {
     chrome.tabs.sendMessage(tab.id, {
       event: "startApplication",
@@ -94,16 +95,18 @@ chrome.contextMenus.onClicked.addListener((info, tab) => {
 
 // Keep track of tabs and their toggle status
 chrome.tabs.onCreated.addListener((tab) => {
-  updateStorage("currentTabs", (currentTabs) => [
-    ...currentTabs,
-    { id: tab.id, toggleIsEnabled: false, toggleIsOn: false },
-  ]);
+  updateStorage({
+    currentTabs: (currentTabs) => [
+      ...currentTabs,
+      { id: tab.id, toggleIsEnabled: false, toggleIsOn: false },
+    ],
+  });
 });
 
 chrome.tabs.onRemoved.addListener((tabId) => {
-  updateStorage("currentTabs", (currentTabs) =>
-    currentTabs.filter((tab) => tab.id !== tabId)
-  );
+  updateStorage({
+    currentTabs: (currentTabs) => currentTabs.filter((tab) => tab.id !== tabId),
+  });
 });
 
 chrome.runtime.onConnect.addListener((port) => {
